@@ -96,10 +96,18 @@ class Game:
     def win(self):
         self.won = True
         self.timer = False
+        for row in self.tiles:
+            for tile in row:
+                if tile.covered and not tile.mine:
+                    tile.covered = False
 
     def lose(self):
         self.lost = True
         self.timer = False
+        for row in self.tiles:
+            for tile in row:
+                if tile.mine and tile.covered:
+                    tile.covered = False
 
     def clearing(self, t):
         (i, j) = t
@@ -154,8 +162,10 @@ class Game:
             for tile in row:
                 if tile.flagged:
                     sprite = self.images["FLAGGED"]
-                elif tile.covered:
+                elif tile.covered and not self.won:
                     sprite = self.images["COVERED"]
+                elif tile.exploded:
+                    sprite = self.images["EXPLODED"]
                 elif tile.mine:
                     sprite = self.images["MINE"]
                 elif tile.adj > 0:
@@ -250,6 +260,7 @@ class Game:
                 if not the_tile.flagged:
                     the_tile.covered = False
                     if the_tile.mine:
+                        the_tile.exploded = True
                         self.lose()
                     else:
                         self.clearing(tuple_cov)
@@ -391,6 +402,7 @@ class Game:
         self.images["FLAGGED"] = pygame.image.load("data/tiles/FLAtile.png")
         self.images["UNCOVERED"] = pygame.image.load("data/tiles/UNCtile.png")
         self.images["MINE"] = pygame.image.load("data/tiles/MINtile.png")
+        self.images["EXPLODED"] = pygame.image.load("data/tiles/EXPtile.png")
         self.images["T_1"] = pygame.image.load("data/tiles/1.png")
         self.images["T_2"] = pygame.image.load("data/tiles/2.png")
         self.images["T_3"] = pygame.image.load("data/tiles/3.png")

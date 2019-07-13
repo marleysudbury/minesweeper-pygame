@@ -7,4 +7,5 @@ class Tile:
         self.covered = True
         self.flagged = False
         self.mine = False
+        self.exploded = False
         # self.show = False
