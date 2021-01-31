@@ -11,6 +11,7 @@ from counter import Counter
 
 class Game:
     """The game class."""
+
     def __init__(self):
         """Initialises game objects."""
         self.TILE_SIZE = 21
@@ -36,12 +37,21 @@ class Game:
         self.time = Counter(30, 15, 0, 0, 0)
         self.mine_left = Counter(30 + (15 * 5), 15, 0, 0, 0)
 
+        # Used to determine juiciness
+        self.tiles_cleared = 0
+
         self.won = False
         self.lost = False
 
         pygame.init()
-        self.game_display = pygame.display.set_mode((self.W_WIDTH, self.W_HEIGHT))
+        self.game_display = pygame.display.set_mode(
+            (self.W_WIDTH, self.W_HEIGHT))
         pygame.display.set_caption("Minesweeper by Marley")
+        pygame.display.set_icon(self.images["FLAGGED"])
+        self.sounds = {}
+        self.load_sounds()
+        self.sounds["music"].play(-1)
+        self.sounds["explosion1"].play()
 
     def loop(self):
         """The game loop."""
@@ -100,6 +110,8 @@ class Game:
             for tile in row:
                 if tile.covered and not tile.mine:
                     tile.covered = False
+        self.sounds["music"].stop()
+        self.sounds["winMusic"].play(-1)
 
     def lose(self):
         self.lost = True
@@ -108,8 +120,11 @@ class Game:
             for tile in row:
                 if tile.mine and tile.covered:
                     tile.covered = False
+        self.sounds["music"].stop()
+        self.sounds["gameOver"].play(-1)
 
     def clearing(self, t):
+        self.tiles_cleared += 1
         (i, j) = t
         if i == 0 and j == 0:
             # Top left
@@ -121,7 +136,7 @@ class Game:
         elif i == self.rows - 1 and j == 0:
             # Bottom left
             adjacent = [(i-1, j), (i-1, j+1),
-                                  (i, j+1)]
+                        (i, j+1)]
         elif i == self.rows - 1 and j == self.cols - 1:
             # Bottom right
             adjacent = [(i-1, j-1), (i-1, j),
@@ -137,7 +152,7 @@ class Game:
         elif j == 0:
             # Left column
             adjacent = [(i-1, j), (i-1, j+1),
-                                  (i, j+1),
+                        (i, j+1),
                         (i+1, j), (i+1, j+1)]
         elif j == self.cols - 1:
             # Right column
@@ -225,14 +240,16 @@ class Game:
         self.mine_left.set_val(self.mines)
 
         self.grid_x = (self.W_WIDTH / 2) - ((self.cols * self.TILE_SIZE)/2)
-        self.grid_y = (self.W_HEIGHT / 2) - ((self.rows * self.TILE_SIZE)/2) + 28
+        self.grid_y = (self.W_HEIGHT / 2) - \
+            ((self.rows * self.TILE_SIZE)/2) + 28
 
         self.tiles = []
 
         for i in range(0, self.rows):
             new_row = []
             for j in range(0, self.cols):
-                new_row.append(Tile(self.grid_x + (self.TILE_SIZE * j), self.grid_y + (self.TILE_SIZE * i)))
+                new_row.append(
+                    Tile(self.grid_x + (self.TILE_SIZE * j), self.grid_y + (self.TILE_SIZE * i)))
             self.tiles.append(new_row)
 
     def click_grid(self, type):
@@ -263,7 +280,10 @@ class Game:
                         the_tile.exploded = True
                         self.lose()
                     else:
+                        self.tiles_cleared = 0
                         self.clearing(tuple_cov)
+                        if self.tiles_cleared > 10:
+                            self.sounds["juicy"].play()
             else:
                 # Toggle flag (unless it is already uncovered)
                 if the_tile.covered:
@@ -306,13 +326,17 @@ class Game:
                 elif i == self.rows - 1 and j == self.cols - 1:
                     this_tile.adj += self.check_neighbour(i, j, [1, 2, 8])
                 elif i == 0:
-                    this_tile.adj += self.check_neighbour(i, j, [4, 5, 6, 7, 8])
+                    this_tile.adj += self.check_neighbour(
+                        i, j, [4, 5, 6, 7, 8])
                 elif i == self.rows - 1:
-                    this_tile.adj += self.check_neighbour(i, j, [1, 2, 3, 4, 8])
+                    this_tile.adj += self.check_neighbour(
+                        i, j, [1, 2, 3, 4, 8])
                 elif j == 0:
-                    this_tile.adj += self.check_neighbour(i, j, [2, 3, 4, 5, 6])
+                    this_tile.adj += self.check_neighbour(
+                        i, j, [2, 3, 4, 5, 6])
                 elif j == self.cols - 1:
-                    this_tile.adj += self.check_neighbour(i, j, [1, 2, 6, 7, 8])
+                    this_tile.adj += self.check_neighbour(
+                        i, j, [1, 2, 6, 7, 8])
                 else:
                     this_tile.adj += self.check_neighbour(i, j)
 
@@ -343,6 +367,12 @@ class Game:
             if event.type == pygame.QUIT:
                 self.stop = True
             if event.type == pygame.MOUSEBUTTONDOWN:
+                # Play relevant sound effect
+                if event.button == 1:
+                    self.sounds["click"].play()
+                else:
+                    self.sounds["rClick"].play()
+
                 # The bastards done a click
                 if self.game_state == "MENU":
                     # The user has clicked in the menu!
@@ -380,6 +410,14 @@ class Game:
                         self.game_state = "PLAY"
                     else:
                         self.game_state = "MENU"
+                elif event.key == pygame.K_r and self.game_state == "PLAYING":
+                    self.sounds["scream"].play()
+                    self.timer = False
+                    self.lost = False
+                    self.won = False
+                    self.start = True
+                    self.time.set_val(0)
+                    self.start_game()
 
     def load_images(self):
         """Loads all images for the game."""
@@ -429,6 +467,46 @@ class Game:
         self.images[7] = pygame.image.load("data/nums/7.png")
         self.images[8] = pygame.image.load("data/nums/8.png")
         self.images[9] = pygame.image.load("data/nums/9.png")
+
+    def load_sounds(self):
+        """Loads all sounds for the game."""
+
+        # Music
+        self.sounds["music"] = pygame.mixer.Sound("data/tunes/music.ogg")
+        self.sounds["music"].set_volume(0.2)
+        self.sounds["winMusic"] = pygame.mixer.Sound("data/tunes/success.ogg")
+        self.sounds["winMusic"].set_volume(0.2)
+        self.sounds["gameOver"] = pygame.mixer.Sound("data/tunes/gameover.ogg")
+
+        # Voice overs during gameplay
+        self.sounds["juicy"] = pygame.mixer.Sound("data/tunes/voice/juice.ogg")
+        self.sounds["finesweeping"] = pygame.mixer.Sound(
+            "data/tunes/voice/finesweeping.ogg")
+        self.sounds["goodjob"] = pygame.mixer.Sound(
+            "data/tunes/voice/goodjob.ogg")
+        self.sounds["grr"] = pygame.mixer.Sound("data/tunes/voice/grr.ogg")
+        self.sounds["merloc"] = pygame.mixer.Sound(
+            "data/tunes/voice/merloc.ogg")
+        self.sounds["thechildren"] = pygame.mixer.Sound(
+            "data/tunes/voice/thechildren.ogg")
+        self.sounds["vn"] = pygame.mixer.Sound("data/tunes/voice/vn.ogg")
+        self.sounds["work"] = pygame.mixer.Sound("data/tunes/voice/work.ogg")
+        self.sounds["youdidit"] = pygame.mixer.Sound(
+            "data/tunes/voice/youdidit.ogg")
+
+        # Miscellaneous sound effects
+        self.sounds["click"] = pygame.mixer.Sound("data/tunes/click.ogg")
+        self.sounds["rClick"] = pygame.mixer.Sound("data/tunes/flag.ogg")
+        self.sounds["scream"] = pygame.mixer.Sound("data/tunes/scream.ogg")
+        self.sounds["explosion1"] = pygame.mixer.Sound(
+            "data/tunes/explosion-01.ogg")
+        self.sounds["explosion1"].set_volume(0.2)
+        self.sounds["explosion2"] = pygame.mixer.Sound(
+            "data/tunes/explosion-02.ogg")
+        self.sounds["explosion3"] = pygame.mixer.Sound(
+            "data/tunes/explosion-03.ogg")
+        self.sounds["explosion4"] = pygame.mixer.Sound(
+            "data/tunes/explosion-04.ogg")
 
 
 if __name__ == "__main__":
