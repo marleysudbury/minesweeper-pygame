@@ -56,6 +56,7 @@ class Game:
     def loop(self):
         """The game loop."""
         while not self.stop:
+            pygame.event.pump()
             self.handle_events()
             pos = pygame.mouse.get_pos()
             if self.game_state == "MENU":
@@ -68,6 +69,8 @@ class Game:
                         self.background = self.images["OPTIONS"]
                     elif 275 <= pos[1]:
                         self.background = self.images["LEADERBOARD"]
+                else:
+                    self.background = self.images["PLAY"]
             elif self.game_state == "PLAY":
                 if pos[1] < 187:
                     self.background = self.images["GAME_1"]
