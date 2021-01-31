@@ -8,4 +8,4 @@ To see the page about this on my website, click [here](https://marleysudbury.git
 
 For original click [here](https://github.com/marleysudbury/Minesweeper).
 
-This version is not yet fully complete (see [issues](https://github.com/marleysudbury/minesweeper-pygame/issues)) , but should be soon.
+This version is not yet fully complete (see [issues](https://github.com/marleysudbury/minesweeper-pygame/issues)), but should be soon.
