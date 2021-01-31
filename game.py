@@ -112,6 +112,13 @@ class Game:
                     tile.covered = False
         self.sounds["music"].stop()
         self.sounds["winMusic"].play(-1)
+        saying = random.randint(0, 3)
+        if saying == 0:
+            self.sounds["finesweeping"].play()
+        elif saying == 1:
+            self.sounds["goodjob"].play()
+        else:
+            self.sounds["youdidit"].play()
 
     def lose(self):
         self.lost = True
@@ -122,6 +129,13 @@ class Game:
                     tile.covered = False
         self.sounds["music"].stop()
         self.sounds["gameOver"].play(-1)
+        self.sounds["explosion1"].play()
+        self.sounds["scream"].play()
+        saying = random.randint(0, 2)
+        if saying == 0:
+            self.sounds["grr"].play()
+        else:
+            self.sounds["merloc"].play()
 
     def clearing(self, t):
         self.tiles_cleared += 1
@@ -373,7 +387,7 @@ class Game:
                 else:
                     self.sounds["rClick"].play()
 
-                # The bastards done a click
+                # The bastard's done a click
                 if self.game_state == "MENU":
                     # The user has clicked in the menu!
                     if self.background == self.images["PLAY"]:
@@ -381,6 +395,7 @@ class Game:
                     elif self.background == self.images["STORY"]:
                         self.game_state = "STORY"
                     elif self.background == self.images["OPTIONS"]:
+                        self.sounds["vn"].play()
                         self.game_state = "OPTIONS"
                     else:
                         self.game_state = "LEADERBOARD"
@@ -400,9 +415,21 @@ class Game:
                     self.click_grid(event.button)
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
+                    # Sound effect
+                    saying = random.randint(0, 2)
+                    if saying == 0:
+                        self.sounds["thechildren"].play()
+                    else:
+                        self.sounds["work"].play()
+
                     if self.game_state == "MENU":
                         self.stop = True
                     elif self.game_state == "PLAYING":
+                        if self.won or self.lost:
+                            self.sounds["winMusic"].stop()
+                            self.sounds["gameOver"].stop()
+                            self.sounds["music"].play()
+
                         self.timer = False
                         self.lost = False
                         self.won = False
@@ -411,6 +438,11 @@ class Game:
                     else:
                         self.game_state = "MENU"
                 elif event.key == pygame.K_r and self.game_state == "PLAYING":
+                    if self.won or self.lost:
+                        self.sounds["winMusic"].stop()
+                        self.sounds["gameOver"].stop()
+                        self.sounds["music"].play()
+
                     self.sounds["scream"].play()
                     self.timer = False
                     self.lost = False
@@ -479,28 +511,49 @@ class Game:
         self.sounds["gameOver"] = pygame.mixer.Sound("data/tunes/gameover.ogg")
 
         # Voice overs during gameplay
+        # "Oooh, juicy" - plays when more than 10 tiles are cleared at once
         self.sounds["juicy"] = pygame.mixer.Sound("data/tunes/voice/juice.ogg")
+
+        # Winning remarks
+        # "That's some mighty fine minesweeping"
         self.sounds["finesweeping"] = pygame.mixer.Sound(
             "data/tunes/voice/finesweeping.ogg")
+        # "Good job corpral"
         self.sounds["goodjob"] = pygame.mixer.Sound(
             "data/tunes/voice/goodjob.ogg")
-        self.sounds["grr"] = pygame.mixer.Sound("data/tunes/voice/grr.ogg")
-        self.sounds["merloc"] = pygame.mixer.Sound(
-            "data/tunes/voice/merloc.ogg")
-        self.sounds["thechildren"] = pygame.mixer.Sound(
-            "data/tunes/voice/thechildren.ogg")
-        self.sounds["vn"] = pygame.mixer.Sound("data/tunes/voice/vn.ogg")
-        self.sounds["work"] = pygame.mixer.Sound("data/tunes/voice/work.ogg")
+        # "You did it"
         self.sounds["youdidit"] = pygame.mixer.Sound(
             "data/tunes/voice/youdidit.ogg")
 
+        # Losing remarks
+        # "Grrrrr"
+        self.sounds["grr"] = pygame.mixer.Sound("data/tunes/voice/grr.ogg")
+        # "Kraklglslask"
+        self.sounds["merloc"] = pygame.mixer.Sound(
+            "data/tunes/voice/merloc.ogg")
+
+        # Utterances of K_ESCAPE
+        # "Think of the children"
+        self.sounds["thechildren"] = pygame.mixer.Sound(
+            "data/tunes/voice/thechildren.ogg")
+        # "Get back to work"
+        self.sounds["work"] = pygame.mixer.Sound("data/tunes/voice/work.ogg")
+
+        # "Vape Naysh y'all", options screen
+        self.sounds["vn"] = pygame.mixer.Sound("data/tunes/voice/vn.ogg")
+
         # Miscellaneous sound effects
+        # Left click "Ugh"
         self.sounds["click"] = pygame.mixer.Sound("data/tunes/click.ogg")
+        # Right click "Brrrrring"
         self.sounds["rClick"] = pygame.mixer.Sound("data/tunes/flag.ogg")
+        # Restart or game over "Aghhh"
         self.sounds["scream"] = pygame.mixer.Sound("data/tunes/scream.ogg")
+        # Boom!
         self.sounds["explosion1"] = pygame.mixer.Sound(
             "data/tunes/explosion-01.ogg")
         self.sounds["explosion1"].set_volume(0.2)
+        # I don't think these explosion noises actually go anywhere
         self.sounds["explosion2"] = pygame.mixer.Sound(
             "data/tunes/explosion-02.ogg")
         self.sounds["explosion3"] = pygame.mixer.Sound(
