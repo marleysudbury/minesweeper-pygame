@@ -411,7 +411,7 @@ class Game:
                     self.game_state = "PLAYING"
                     self.start = True
                     self.start_game()
-                elif self.game_state == "PLAYING":
+                elif self.game_state == "PLAYING" and not self.won and not self.lost:
                     self.click_grid(event.button)
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
