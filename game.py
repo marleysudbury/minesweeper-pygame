@@ -55,6 +55,8 @@ class Game:
         self.sounds["music"].play(-1)
         self.sounds["explosion1"].play()
 
+        self.load_leaderboard()
+
     def loop(self):
         """The game loop."""
         while not self.stop:
@@ -122,21 +124,31 @@ class Game:
 
     def load_leaderboard(self):
         self.leaderboard = {}
-        text = open('data/leader.txt').split('\n')
+        lb_file = open('data/leader.txt')
+        text = lb_file.read().split('\n')
         for i in range(0, len(text)):
-            self.leaderboard[0] = text[0].split(',')
+            self.leaderboard[i] = text[i].split(',')
 
-        self.leaderboard
+        lb_file.close()
+
+    def save_leaderboard(self):
+        text = ''
+        for i in range(0, len(self.leaderboard)):
+            text += '{},{}\n'.format(self.leaderboard[i]
+                                     [0], self.leaderboard[i][1])
+        lb_file = open('data/leader.txt')
+        lb_file.write(text)
+        lb_file.close()
 
     def display_leaderboard(self):
         easy = self.font.render('{:<12}{:<10}{}'.format(
-            'Easy', 'Marley', '20'), True, (255, 0, 0))
+            'Easy', self.leaderboard[0][0], self.leaderboard[0][1]), True, (255, 0, 0))
         medium = self.font.render(
-            '{:<12}{:<10}{}'.format('Medium', 'Marley', '20'), True, (255, 0, 0))
+            '{:<12}{}{}'.format('Medium', self.leaderboard[1][0], self.leaderboard[1][1]), True, (255, 0, 0))
         hard = self.font.render('{:<12}{:<10}{}'.format(
-            'Hard', 'Marley', '20'), True, (255, 0, 0))
+            'Hard', self.leaderboard[2][0], self.leaderboard[2][1]), True, (255, 0, 0))
         concentric = self.font.render(
-            '{:<12}{:<10}{}'.format('Concentric', 'Marley', 'Stage 5'), True, (255, 0, 0))
+            '{:<12}{}{:>10}'.format('Concentric', self.leaderboard[3][0], ' stage ' + self.leaderboard[3][1]), True, (255, 0, 0))
         self.game_display.blit(easy, (50, 90))
         self.game_display.blit(medium, (50, 120))
         self.game_display.blit(hard, (50, 150))
