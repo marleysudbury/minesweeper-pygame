@@ -14,15 +14,21 @@ class Game:
 
     def __init__(self):
         """Initialises game objects."""
+        pygame.init()
+        self.W_WIDTH = 600
+        self.W_HEIGHT = 500
+        self.game_display = pygame.display.set_mode(
+            (self.W_WIDTH, self.W_HEIGHT))
+        pygame.display.set_caption("Minesweeper by Marley")
+
         self.TILE_SIZE = 21
         self.game_state = "MENU"
         self.game_mode = "EASY"
-        self.W_WIDTH = 600
-        self.W_HEIGHT = 500
         self.stop = False
 
         self.images = {}
         self.load_images()
+        pygame.display.set_icon(self.images["FLAGGED"])
         self.background = self.images["PLAY"]
 
         self.cols = 0
@@ -43,11 +49,7 @@ class Game:
         self.won = False
         self.lost = False
 
-        pygame.init()
-        self.game_display = pygame.display.set_mode(
-            (self.W_WIDTH, self.W_HEIGHT))
-        pygame.display.set_caption("Minesweeper by Marley")
-        pygame.display.set_icon(self.images["FLAGGED"])
+        self.load_fonts()
         self.sounds = {}
         self.load_sounds()
         self.sounds["music"].play(-1)
@@ -84,15 +86,25 @@ class Game:
                     self.background = self.images["GAME_5"]
             elif self.game_state == "PLAYING":
                 current_time = time.time()
-                # print("Start time: {}\nCurrent time: {}\nDif: {}\nTimer: {}".format(self.start_time, current_time, current_time-self.start_time, self.timer))
                 if current_time - self.start_time >= 1 and self.timer:
-                    # print("ACTIVATE")
                     self.start_time = current_time
                     self.time.increment()
                 self.background = self.images["GAME_BG"]
             elif self.game_state == "STORY":
                 self.background = self.images["STORY_SCREEN"]
-
+            elif self.game_state == "OPTIONS":
+                if pos[1] < 187:
+                    self.background = self.images["RESET_LEADERBOARD"]
+                elif 187 <= pos[1] < 230:
+                    self.background = self.images["MUTE_SOUND"]
+                elif 230 <= pos[1] < 274:
+                    self.background = self.images["RETURN_TO_MENU"]
+                elif 274 <= pos[1] < 316:
+                    self.background = self.images["GAME_4"]
+                else:
+                    self.background = self.images["GAME_5"]
+            elif self.game_state == "LEADERBOARD":
+                self.background = self.images["LEADERBOARD_SCREEN"]
             # Draw
             self.game_display.blit(self.background, (0, 0))
             if self.game_state == "PLAYING":
@@ -102,9 +114,33 @@ class Game:
                     self.game_display.blit(self.images["LOSE"], (0, 0))
                 elif self.won:
                     self.game_display.blit(self.images["WIN"], (0, 0))
+            elif self.game_state == "LEADERBOARD":
+                self.display_leaderboard()
             pygame.display.update()
         pygame.quit()
         quit()
+
+    def load_leaderboard(self):
+        self.leaderboard = {}
+        text = open('data/leader.txt').split('\n')
+        for i in range(0, len(text)):
+            self.leaderboard[0] = text[0].split(',')
+
+        self.leaderboard
+
+    def display_leaderboard(self):
+        easy = self.font.render('{:<12}{:<10}{}'.format(
+            'Easy', 'Marley', '20'), True, (255, 0, 0))
+        medium = self.font.render(
+            '{:<12}{:<10}{}'.format('Medium', 'Marley', '20'), True, (255, 0, 0))
+        hard = self.font.render('{:<12}{:<10}{}'.format(
+            'Hard', 'Marley', '20'), True, (255, 0, 0))
+        concentric = self.font.render(
+            '{:<12}{:<10}{}'.format('Concentric', 'Marley', 'Stage 5'), True, (255, 0, 0))
+        self.game_display.blit(easy, (50, 90))
+        self.game_display.blit(medium, (50, 120))
+        self.game_display.blit(hard, (50, 150))
+        self.game_display.blit(concentric, (50, 180))
 
     def win(self):
         self.won = True
@@ -490,6 +526,15 @@ class Game:
         # Story
         self.images["STORY_SCREEN"] = pygame.image.load("data/storyS.png")
 
+        # Options options
+        self.images["RESET_LEADERBOARD"] = pygame.image.load(
+            "data/options1.png")
+        self.images["MUTE_SOUND"] = pygame.image.load("data/options2.png")
+        self.images["RETURN_TO_MENU"] = pygame.image.load("data/options2.png")
+
+        # Leaderboard
+        self.images["LEADERBOARD_SCREEN"] = pygame.image.load("data/blank.png")
+
         # Counter
         self.images["-"] = pygame.image.load("data/nums/-.png")
         self.images[0] = pygame.image.load("data/nums/0.png")
@@ -563,6 +608,11 @@ class Game:
             "data/tunes/explosion-03.ogg")
         self.sounds["explosion4"] = pygame.mixer.Sound(
             "data/tunes/explosion-04.ogg")
+
+    def load_fonts(self):
+        """Loads the fonts required for the game."""
+        # TODO: make this cope with missing fonts!
+        self.font = pygame.font.SysFont('andalemonottf', 24)
 
 
 if __name__ == "__main__":
