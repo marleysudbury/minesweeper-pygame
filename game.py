@@ -95,16 +95,12 @@ class Game:
             elif self.game_state == "STORY":
                 self.background = self.images["STORY_SCREEN"]
             elif self.game_state == "OPTIONS":
-                if pos[1] < 187:
+                if pos[1] < 210:
                     self.background = self.images["RESET_LEADERBOARD"]
-                elif 187 <= pos[1] < 230:
+                elif 210 <= pos[1] < 300:
                     self.background = self.images["MUTE_SOUND"]
-                elif 230 <= pos[1] < 274:
-                    self.background = self.images["RETURN_TO_MENU"]
-                elif 274 <= pos[1] < 316:
-                    self.background = self.images["GAME_4"]
                 else:
-                    self.background = self.images["GAME_5"]
+                    self.background = self.images["RETURN_TO_MENU"]
             elif self.game_state == "LEADERBOARD":
                 self.background = self.images["LEADERBOARD_SCREEN"]
             # Draw
@@ -139,6 +135,13 @@ class Game:
         lb_file = open('data/leader.txt', 'w')
         lb_file.write(text)
         lb_file.close()
+
+    def reset_leaderboard(self):
+        text = '???,999\n???,999\n???,999\n???,0'
+        lb_file = open('data/leader.txt', 'w')
+        lb_file.write(text)
+        lb_file.close()
+        self.load_leaderboard()
 
     def display_leaderboard(self):
         easy = self.font.render('{:<12}{:<10}{}'.format(
@@ -481,6 +484,13 @@ class Game:
                     self.start_game()
                 elif self.game_state == "PLAYING" and not self.won and not self.lost:
                     self.click_grid(event.button)
+                elif self.game_state == "OPTIONS":
+                    if self.background == self.images["RESET_LEADERBOARD"]:
+                        self.reset_leaderboard()
+                    elif self.background == self.images["MUTE_SOUND"]:
+                        print("SHhh")
+                    elif self.background == self.images["RETURN_TO_MENU"]:
+                        self.game_state = "MENU"
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     # Sound effect
@@ -559,7 +569,7 @@ class Game:
         self.images["RESET_LEADERBOARD"] = pygame.image.load(
             "data/options1.png")
         self.images["MUTE_SOUND"] = pygame.image.load("data/options2.png")
-        self.images["RETURN_TO_MENU"] = pygame.image.load("data/options2.png")
+        self.images["RETURN_TO_MENU"] = pygame.image.load("data/options3.png")
 
         # Leaderboard
         self.images["LEADERBOARD_SCREEN"] = pygame.image.load("data/blank.png")
