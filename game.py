@@ -133,10 +133,10 @@ class Game:
 
     def save_leaderboard(self):
         text = ''
-        for i in range(0, len(self.leaderboard)):
-            text += '{},{}\n'.format(self.leaderboard[i]
-                                     [0], self.leaderboard[i][1])
-        lb_file = open('data/leader.txt')
+        for i in range(0, 4):
+            text += '{},{}\n'.format(self.leaderboard[i][0],
+                                     self.leaderboard[i][1])
+        lb_file = open('data/leader.txt', 'w')
         lb_file.write(text)
         lb_file.close()
 
@@ -144,7 +144,7 @@ class Game:
         easy = self.font.render('{:<12}{:<10}{}'.format(
             'Easy', self.leaderboard[0][0], self.leaderboard[0][1]), True, (255, 0, 0))
         medium = self.font.render(
-            '{:<12}{}{}'.format('Medium', self.leaderboard[1][0], self.leaderboard[1][1]), True, (255, 0, 0))
+            '{:<12}{:<10}{}'.format('Medium', self.leaderboard[1][0], self.leaderboard[1][1]), True, (255, 0, 0))
         hard = self.font.render('{:<12}{:<10}{}'.format(
             'Hard', self.leaderboard[2][0], self.leaderboard[2][1]), True, (255, 0, 0))
         concentric = self.font.render(
@@ -157,6 +157,23 @@ class Game:
     def win(self):
         self.won = True
         self.timer = False
+        if self.game_mode == "EASY":
+            if self.time.get_val() < int(self.leaderboard[0][1]):
+                self.leaderboard[0][0] = "MSR"
+                self.leaderboard[0][1] = "{:0>3}".format(self.time.get_val())
+        if self.game_mode == "MEDIUM":
+            if self.time.get_val() < int(self.leaderboard[1][1]):
+                self.leaderboard[1][0] = "MSR"
+                self.leaderboard[1][1] = "{:0>3}".format(self.time.get_val())
+        if self.game_mode == "HARD":
+            if self.time.get_val() < int(self.leaderboard[2][1]):
+                self.leaderboard[2][0] = "MSR"
+                self.leaderboard[2][1] = "{:0>3}".format(self.time.get_val())
+        if self.game_mode == "CONCENTRIC":
+            print("hmm")
+
+        self.save_leaderboard()
+
         for row in self.tiles:
             for tile in row:
                 if tile.covered and not tile.mine:
