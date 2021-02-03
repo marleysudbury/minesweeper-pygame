@@ -58,7 +58,11 @@ class Game:
 
         self.load_leaderboard()
 
-        self.box = TextBox(50, 50, 100, 50)
+        # self.box = TextBox(50, 50, 100, 50)
+        self.box = None
+
+        # Should the current box.get_value() be returned?
+        self.return_value = False
 
     def loop(self):
         """The game loop."""
@@ -106,6 +110,10 @@ class Game:
                     self.background = self.images["RETURN_TO_MENU"]
             elif self.game_state == "LEADERBOARD":
                 self.background = self.images["LEADERBOARD_SCREEN"]
+
+            if self.return_value:
+                self.update_leaderboard()
+
             # Draw
             self.game_display.blit(self.background, (0, 0))
             if self.game_state == "PLAYING":
@@ -123,6 +131,37 @@ class Game:
             pygame.display.update()
         pygame.quit()
         quit()
+
+    def update_leaderboard(self):
+        self.return_value = False
+        if self.game_mode == "EASY":
+            if self.time.get_val() < int(self.leaderboard[0][1]):
+                self.leaderboard[0][0] = self.box.get_val()
+                self.leaderboard[0][1] = "{:0>3}".format(self.time.get_val())
+        if self.game_mode == "MEDIUM":
+            if self.time.get_val() < int(self.leaderboard[1][1]):
+                self.get_name()
+                self.leaderboard[1][0] = self.box.get_val()
+                self.leaderboard[1][1] = "{:0>3}".format(self.time.get_val())
+        if self.game_mode == "HARD":
+            if self.time.get_val() < int(self.leaderboard[2][1]):
+                self.get_name()
+                self.leaderboard[2][0] = self.box.get_val()
+                self.leaderboard[2][1] = "{:0>3}".format(self.time.get_val())
+
+        self.box = None
+
+        self.sounds["winMusic"].stop()
+        self.sounds["gameOver"].stop()
+        self.sounds["music"].play()
+
+        self.timer = False
+        self.lost = False
+        self.won = False
+        self.time.set_val(0)
+
+        self.game_state = "LEADERBOARD"
+        self.save_leaderboard()
 
     def load_leaderboard(self):
         self.leaderboard = {}
@@ -164,8 +203,7 @@ class Game:
         self.game_display.blit(concentric, (50, 180))
 
     def get_name(self):
-        self.box = TextBox(50, 50, 100, 20)
-        return box.get_val()
+        self.box = TextBox(50, 50, 100, 50)
 
     def win(self):
         # TODO: refactor the heck out of this plz
@@ -173,20 +211,15 @@ class Game:
         self.timer = False
         if self.game_mode == "EASY":
             if self.time.get_val() < int(self.leaderboard[0][1]):
-                self.leaderboard[0][0] = self.get_name()
-                self.leaderboard[0][1] = "{:0>3}".format(self.time.get_val())
+                self.get_name()
         if self.game_mode == "MEDIUM":
             if self.time.get_val() < int(self.leaderboard[1][1]):
-                self.leaderboard[1][0] = "MSR"
-                self.leaderboard[1][1] = "{:0>3}".format(self.time.get_val())
+                self.get_name()
         if self.game_mode == "HARD":
             if self.time.get_val() < int(self.leaderboard[2][1]):
-                self.leaderboard[2][0] = "MSR"
-                self.leaderboard[2][1] = "{:0>3}".format(self.time.get_val())
+                self.get_name()
         if self.game_mode == "CONCENTRIC":
             print("hmm")
-
-        self.save_leaderboard()
 
         for row in self.tiles:
             for tile in row:
@@ -507,7 +540,7 @@ class Game:
                     if event.key == pygame.K_ESCAPE:
                         self.box = None
                     elif event.key == pygame.K_RETURN:
-                        print("Enter the wagen")
+                        self.return_value = True
                     else:
                         self.box.key_response(event)
                 elif event.key == pygame.K_ESCAPE:
