@@ -7,6 +7,7 @@ import random
 import time
 from tile import Tile
 from counter import Counter
+from text_box import TextBox
 
 
 class Game:
@@ -56,6 +57,8 @@ class Game:
         self.sounds["explosion1"].play()
 
         self.load_leaderboard()
+
+        self.box = TextBox(50, 50, 100, 50)
 
     def loop(self):
         """The game loop."""
@@ -114,6 +117,9 @@ class Game:
                     self.game_display.blit(self.images["WIN"], (0, 0))
             elif self.game_state == "LEADERBOARD":
                 self.display_leaderboard()
+
+            if self.box != None:
+                self.box.draw(self)
             pygame.display.update()
         pygame.quit()
         quit()
@@ -157,12 +163,17 @@ class Game:
         self.game_display.blit(hard, (50, 150))
         self.game_display.blit(concentric, (50, 180))
 
+    def get_name(self):
+        self.box = TextBox(50, 50, 100, 20)
+        return box.get_val()
+
     def win(self):
+        # TODO: refactor the heck out of this plz
         self.won = True
         self.timer = False
         if self.game_mode == "EASY":
             if self.time.get_val() < int(self.leaderboard[0][1]):
-                self.leaderboard[0][0] = "MSR"
+                self.leaderboard[0][0] = self.get_name()
                 self.leaderboard[0][1] = "{:0>3}".format(self.time.get_val())
         if self.game_mode == "MEDIUM":
             if self.time.get_val() < int(self.leaderboard[1][1]):
@@ -492,7 +503,14 @@ class Game:
                     elif self.background == self.images["RETURN_TO_MENU"]:
                         self.game_state = "MENU"
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
+                if self.box != None:
+                    if event.key == pygame.K_ESCAPE:
+                        self.box = None
+                    elif event.key == pygame.K_RETURN:
+                        print("Enter the wagen")
+                    else:
+                        self.box.key_response(event)
+                elif event.key == pygame.K_ESCAPE:
                     # Sound effect
                     saying = random.randint(0, 2)
                     if saying == 0:
