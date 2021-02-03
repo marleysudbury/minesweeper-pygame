@@ -31,15 +31,20 @@ class TextBox:
             return True
 
     def draw(self, parent):
-        font = pygame.font.SysFont('calibritff', 48)
-        img = font.render(self.value, True, (255, 255, 255))
+        font = pygame.font.SysFont(None, 25)
+        caption = font.render("Please enter name:", True, (0, 0, 0))
+        img = parent.font.render(self.value, True, (255, 255, 255))
         rect = img.get_rect()
+        back_back_rect = pygame.Rect(0, 0, parent.W_WIDTH, parent.W_HEIGHT)
         back_rect = pygame.Rect(self.x, self.y, self.w, self.h)
         rect.topleft = (self.x+10, self.y+10)
         cursor = pygame.Rect(
-            (rect.bottomright[0], rect.bottomright[1]-5), (20, 5))
-
+            (rect.bottomright[0], rect.bottomright[1]-5), (12, 2))
+        caption_rect = pygame.Rect(
+            (rect.topleft[0]-55, rect.topleft[1]-30), (self.w, self.h))
+        pygame.draw.rect(parent.game_display, (255, 255, 255), back_back_rect)
         pygame.draw.rect(parent.game_display, (0, 0, 0), back_rect)
+        parent.game_display.blit(caption, caption_rect)
         if time.time() % 1 > 0.5 and not self.too_big():
             pygame.draw.rect(parent.game_display, (255, 255, 255), cursor)
         parent.game_display.blit(img, rect)

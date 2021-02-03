@@ -8,6 +8,7 @@ import time
 from tile import Tile
 from counter import Counter
 from text_box import TextBox
+from pathlib import Path
 
 
 class Game:
@@ -58,7 +59,7 @@ class Game:
 
         self.load_leaderboard()
 
-        # self.box = TextBox(50, 50, 100, 50)
+        # self.box = TextBox(self.W_WIDTH/2-65/2, self.W_HEIGHT/2-45/2, 65, 45)
         self.box = None
 
         # Should the current box.get_value() be returned?
@@ -203,7 +204,7 @@ class Game:
         self.game_display.blit(concentric, (50, 180))
 
     def get_name(self):
-        self.box = TextBox(50, 50, 100, 50)
+        self.box = TextBox(self.W_WIDTH/2-65/2, self.W_HEIGHT/2-45/2, 65, 45)
 
     def win(self):
         # TODO: refactor the heck out of this plz
@@ -582,122 +583,163 @@ class Game:
 
     def load_images(self):
         """Loads all images for the game."""
+
+        image_path = Path("data")
+
         # Menu options
-        self.images["PLAY"] = pygame.image.load("data/play.png")
-        self.images["STORY"] = pygame.image.load("data/story.png")
-        self.images["OPTIONS"] = pygame.image.load("data/options.png")
-        self.images["LEADERBOARD"] = pygame.image.load("data/leaderboard.png")
+        self.images["PLAY"] = pygame.image.load(str(image_path / "play.png"))
+        self.images["STORY"] = pygame.image.load(str(image_path / "story.png"))
+        self.images["OPTIONS"] = pygame.image.load(
+            str(image_path / "options.png"))
+        self.images["LEADERBOARD"] = pygame.image.load(
+            str(image_path / "leaderboard.png"))
 
         # Game type selection
-        self.images["GAME_1"] = pygame.image.load("data/gameMode1.png")
-        self.images["GAME_2"] = pygame.image.load("data/gameMode2.png")
-        self.images["GAME_3"] = pygame.image.load("data/gameMode3.png")
-        self.images["GAME_4"] = pygame.image.load("data/gameMode4.png")
-        self.images["GAME_5"] = pygame.image.load("data/gameMode5.png")
+        self.images["GAME_1"] = pygame.image.load(
+            str(image_path / "gameMode1.png"))
+        self.images["GAME_2"] = pygame.image.load(
+            str(image_path / "gameMode2.png"))
+        self.images["GAME_3"] = pygame.image.load(
+            str(image_path / "gameMode3.png"))
+        self.images["GAME_4"] = pygame.image.load(
+            str(image_path / "gameMode4.png"))
+        self.images["GAME_5"] = pygame.image.load(
+            str(image_path / "gameMode5.png"))
 
         # Play
-        self.images["GAME_BG"] = pygame.image.load("data/blank.png")
-        self.images["COVERED"] = pygame.image.load("data/tiles/COVtile.png")
-        self.images["FLAGGED"] = pygame.image.load("data/tiles/FLAtile.png")
-        self.images["UNCOVERED"] = pygame.image.load("data/tiles/UNCtile.png")
-        self.images["MINE"] = pygame.image.load("data/tiles/MINtile.png")
-        self.images["EXPLODED"] = pygame.image.load("data/tiles/EXPtile.png")
-        self.images["T_1"] = pygame.image.load("data/tiles/1.png")
-        self.images["T_2"] = pygame.image.load("data/tiles/2.png")
-        self.images["T_3"] = pygame.image.load("data/tiles/3.png")
-        self.images["T_4"] = pygame.image.load("data/tiles/4.png")
-        self.images["T_5"] = pygame.image.load("data/tiles/5.png")
-        self.images["T_6"] = pygame.image.load("data/tiles/6.png")
-        self.images["T_7"] = pygame.image.load("data/tiles/7.png")
-        self.images["T_8"] = pygame.image.load("data/tiles/8.png")
-        self.images["WIN"] = pygame.image.load("data/won.png")
-        self.images["LOSE"] = pygame.image.load("data/lost.png")
+        self.images["GAME_BG"] = pygame.image.load(
+            str(image_path / "blank.png"))
+        self.images["COVERED"] = pygame.image.load(
+            str(image_path / "tiles" / "COVtile.png"))
+        self.images["FLAGGED"] = pygame.image.load(
+            str(image_path / "tiles" / "FLAtile.png"))
+        self.images["UNCOVERED"] = pygame.image.load(
+            str(image_path / "tiles" / "UNCtile.png"))
+        self.images["MINE"] = pygame.image.load(
+            str(image_path / "tiles" / "MINtile.png"))
+        self.images["EXPLODED"] = pygame.image.load(
+            str(image_path / "tiles" / "EXPtile.png"))
+        self.images["T_1"] = pygame.image.load(
+            str(image_path / "tiles" / "1.png"))
+        self.images["T_2"] = pygame.image.load(
+            str(image_path / "tiles" / "2.png"))
+        self.images["T_3"] = pygame.image.load(
+            str(image_path / "tiles" / "3.png"))
+        self.images["T_4"] = pygame.image.load(
+            str(image_path / "tiles" / "4.png"))
+        self.images["T_5"] = pygame.image.load(
+            str(image_path / "tiles" / "5.png"))
+        self.images["T_6"] = pygame.image.load(
+            str(image_path / "tiles" / "6.png"))
+        self.images["T_7"] = pygame.image.load(
+            str(image_path / "tiles" / "7.png"))
+        self.images["T_8"] = pygame.image.load(
+            str(image_path / "tiles" / "8.png"))
+        self.images["WIN"] = pygame.image.load(str(image_path / "won.png"))
+        self.images["LOSE"] = pygame.image.load(str(image_path / "lost.png"))
 
         # Story
-        self.images["STORY_SCREEN"] = pygame.image.load("data/storyS.png")
+        self.images["STORY_SCREEN"] = pygame.image.load(
+            str(image_path / "storyS.png"))
 
         # Options options
         self.images["RESET_LEADERBOARD"] = pygame.image.load(
-            "data/options1.png")
-        self.images["MUTE_SOUND"] = pygame.image.load("data/options2.png")
-        self.images["RETURN_TO_MENU"] = pygame.image.load("data/options3.png")
+            str(image_path / "options1.png"))
+        self.images["MUTE_SOUND"] = pygame.image.load(
+            str(image_path / "options2.png"))
+        self.images["RETURN_TO_MENU"] = pygame.image.load(
+            str(image_path / "options3.png"))
 
         # Leaderboard
-        self.images["LEADERBOARD_SCREEN"] = pygame.image.load("data/blank.png")
+        self.images["LEADERBOARD_SCREEN"] = pygame.image.load(
+            str(image_path / "blank.png"))
 
         # Counter
-        self.images["-"] = pygame.image.load("data/nums/-.png")
-        self.images[0] = pygame.image.load("data/nums/0.png")
-        self.images[1] = pygame.image.load("data/nums/1.png")
-        self.images[2] = pygame.image.load("data/nums/2.png")
-        self.images[3] = pygame.image.load("data/nums/3.png")
-        self.images[4] = pygame.image.load("data/nums/4.png")
-        self.images[5] = pygame.image.load("data/nums/5.png")
-        self.images[6] = pygame.image.load("data/nums/6.png")
-        self.images[7] = pygame.image.load("data/nums/7.png")
-        self.images[8] = pygame.image.load("data/nums/8.png")
-        self.images[9] = pygame.image.load("data/nums/9.png")
+        self.images["-"] = pygame.image.load(
+            str(image_path / "nums" / "-.png"))
+        self.images[0] = pygame.image.load(str(image_path / "nums" / "0.png"))
+        self.images[1] = pygame.image.load(str(image_path / "nums" / "1.png"))
+        self.images[2] = pygame.image.load(str(image_path / "nums" / "2.png"))
+        self.images[3] = pygame.image.load(str(image_path / "nums" / "3.png"))
+        self.images[4] = pygame.image.load(str(image_path / "nums" / "4.png"))
+        self.images[5] = pygame.image.load(str(image_path / "nums" / "5.png"))
+        self.images[6] = pygame.image.load(str(image_path / "nums" / "6.png"))
+        self.images[7] = pygame.image.load(str(image_path / "nums" / "7.png"))
+        self.images[8] = pygame.image.load(str(image_path / "nums" / "8.png"))
+        self.images[9] = pygame.image.load(str(image_path / "nums" / "9.png"))
 
     def load_sounds(self):
         """Loads all sounds for the game."""
 
+        sound_path = Path("data/tunes")
+
         # Music
-        self.sounds["music"] = pygame.mixer.Sound("data/tunes/music.ogg")
+        self.sounds["music"] = pygame.mixer.Sound(
+            str(sound_path / "music.ogg"))
         self.sounds["music"].set_volume(0.2)
-        self.sounds["winMusic"] = pygame.mixer.Sound("data/tunes/success.ogg")
+        self.sounds["winMusic"] = pygame.mixer.Sound(
+            str(sound_path / "success.ogg"))
         self.sounds["winMusic"].set_volume(0.2)
-        self.sounds["gameOver"] = pygame.mixer.Sound("data/tunes/gameover.ogg")
+        self.sounds["gameOver"] = pygame.mixer.Sound(
+            str(sound_path / "gameover.ogg"))
 
         # Voice overs during gameplay
         # "Oooh, juicy" - plays when more than 10 tiles are cleared at once
-        self.sounds["juicy"] = pygame.mixer.Sound("data/tunes/voice/juice.ogg")
+        self.sounds["juicy"] = pygame.mixer.Sound(
+            str(sound_path / "voice" / "juice.ogg"))
 
         # Winning remarks
         # "That's some mighty fine minesweeping"
         self.sounds["finesweeping"] = pygame.mixer.Sound(
-            "data/tunes/voice/finesweeping.ogg")
+            str(sound_path / "voice" / "finesweeping.ogg"))
         # "Good job corpral"
         self.sounds["goodjob"] = pygame.mixer.Sound(
-            "data/tunes/voice/goodjob.ogg")
+            str(sound_path / "voice" / "goodjob.ogg"))
         # "You did it"
         self.sounds["youdidit"] = pygame.mixer.Sound(
-            "data/tunes/voice/youdidit.ogg")
+            str(sound_path / "voice" / "youdidit.ogg"))
 
         # Losing remarks
         # "Grrrrr"
-        self.sounds["grr"] = pygame.mixer.Sound("data/tunes/voice/grr.ogg")
+        self.sounds["grr"] = pygame.mixer.Sound(
+            str(sound_path / "voice" / "grr.ogg"))
         # "Kraklglslask"
         self.sounds["merloc"] = pygame.mixer.Sound(
-            "data/tunes/voice/merloc.ogg")
+            str(sound_path / "voice" / "merloc.ogg"))
 
         # Utterances of K_ESCAPE
         # "Think of the children"
         self.sounds["thechildren"] = pygame.mixer.Sound(
-            "data/tunes/voice/thechildren.ogg")
+            str(sound_path / "voice" / "thechildren.ogg"))
         # "Get back to work"
-        self.sounds["work"] = pygame.mixer.Sound("data/tunes/voice/work.ogg")
+        self.sounds["work"] = pygame.mixer.Sound(
+            str(sound_path / "voice" / "work.ogg"))
 
         # "Vape Naysh y'all", options screen
-        self.sounds["vn"] = pygame.mixer.Sound("data/tunes/voice/vn.ogg")
+        self.sounds["vn"] = pygame.mixer.Sound(
+            str(sound_path / "voice" / "vn.ogg"))
 
         # Miscellaneous sound effects
         # Left click "Ugh"
-        self.sounds["click"] = pygame.mixer.Sound("data/tunes/click.ogg")
+        self.sounds["click"] = pygame.mixer.Sound(
+            str(sound_path / "click.ogg"))
         # Right click "Brrrrring"
-        self.sounds["rClick"] = pygame.mixer.Sound("data/tunes/flag.ogg")
+        self.sounds["rClick"] = pygame.mixer.Sound(
+            str(sound_path / "flag.ogg"))
         # Restart or game over "Aghhh"
-        self.sounds["scream"] = pygame.mixer.Sound("data/tunes/scream.ogg")
+        self.sounds["scream"] = pygame.mixer.Sound(
+            str(sound_path / "scream.ogg"))
         # Boom!
         self.sounds["explosion1"] = pygame.mixer.Sound(
-            "data/tunes/explosion-01.ogg")
+            str(sound_path / "explosion-01.ogg"))
         self.sounds["explosion1"].set_volume(0.2)
         # I don't think these explosion noises actually go anywhere
         self.sounds["explosion2"] = pygame.mixer.Sound(
-            "data/tunes/explosion-02.ogg")
+            str(sound_path / "explosion-02.ogg"))
         self.sounds["explosion3"] = pygame.mixer.Sound(
-            "data/tunes/explosion-03.ogg")
+            str(sound_path / "explosion-03.ogg"))
         self.sounds["explosion4"] = pygame.mixer.Sound(
-            "data/tunes/explosion-04.ogg")
+            str(sound_path / "explosion-04.ogg"))
 
     def load_fonts(self):
         """Loads the fonts required for the game."""
