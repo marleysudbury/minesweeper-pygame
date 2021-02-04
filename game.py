@@ -52,6 +52,7 @@ class Game:
         self.lost = False
 
         self.load_fonts()
+        pygame.mixer.init()
         self.sounds = {}
         self.load_sounds()
         self.sounds["music"].play(-1)
@@ -744,7 +745,12 @@ class Game:
     def load_fonts(self):
         """Loads the fonts required for the game."""
         # TODO: make this cope with missing fonts!
-        self.font = pygame.font.SysFont('andalemonottf', 24)
+        if 'andalemonottf' in pygame.font.get_fonts():
+            self.font = pygame.font.SysFont('andalemonottf', 24)
+        else:
+            self.font = pygame.font.SysFont('lucidaconsole', 24)
+        
+        
 
 
 if __name__ == "__main__":
