@@ -255,7 +255,6 @@ class Game:
             self.sounds["merloc"].play()
 
     def clearing(self, t):
-        self.tiles_cleared += 1
         (i, j) = t
         if i == 0 and j == 0:
             # Top left
@@ -299,7 +298,8 @@ class Game:
         if self.tiles[i][j].adj == 0:
             for x in range(0, len(adjacent)):
                 n_t = adjacent[x]
-                if self.tiles[n_t[0]][n_t[1]].covered:
+                if self.tiles[n_t[0]][n_t[1]].covered and not self.tiles[n_t[0]][n_t[1]].flagged:
+                    self.tiles_cleared += 1
                     self.tiles[n_t[0]][n_t[1]].covered = False
                     self.clearing(n_t)
 
@@ -749,8 +749,6 @@ class Game:
             self.font = pygame.font.SysFont('andalemonottf', 24)
         else:
             self.font = pygame.font.SysFont('lucidaconsole', 24)
-        
-        
 
 
 if __name__ == "__main__":
