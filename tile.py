@@ -8,4 +8,4 @@ class Tile:
         self.flagged = False
         self.mine = False
         self.exploded = False
-        # self.show = False
+        self.unsure = False

@@ -306,7 +306,9 @@ class Game:
     def display_tiles(self):
         for row in self.tiles:
             for tile in row:
-                if tile.flagged:
+                if tile.unsure:
+                    sprite = self.images["QUESTION"]
+                elif tile.flagged:
                     sprite = self.images["FLAGGED"]
                 elif tile.covered and not self.won:
                     sprite = self.images["COVERED"]
@@ -419,9 +421,12 @@ class Game:
                 # Toggle flag (unless it is already uncovered)
                 if the_tile.covered:
                     # the_tile.flagged = not the_tile.flagged
-                    if the_tile.flagged:
-                        the_tile.flagged = False
+                    if the_tile.flagged and not the_tile.unsure:
+                        the_tile.unsure = True
                         self.mine_left.increment()
+                    elif the_tile.flagged:
+                        the_tile.flagged = False
+                        the_tile.unsure = False
                     else:
                         the_tile.flagged = True
                         self.mine_left.decrement()
@@ -429,7 +434,7 @@ class Game:
                             correct = True
                             for row in self.tiles:
                                 for tile in row:
-                                    if tile.mine and not tile.flagged or not tile.mine and tile.flagged:
+                                    if tile.mine and not tile.flagged or not tile.mine and tile.flagged and not tile.unsure:
                                         correct = False
                             if correct:
                                 self.win()
@@ -620,6 +625,8 @@ class Game:
             str(image_path / "tiles" / "MINtile.png"))
         self.images["EXPLODED"] = pygame.image.load(
             str(image_path / "tiles" / "EXPtile.png"))
+        self.images["QUESTION"] = pygame.image.load(
+            str(image_path / "tiles" / "QUEtile.png"))
         self.images["T_1"] = pygame.image.load(
             str(image_path / "tiles" / "1.png"))
         self.images["T_2"] = pygame.image.load(
