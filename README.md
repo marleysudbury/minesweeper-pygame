@@ -8,6 +8,7 @@ Originally written in MonkeyX for my A level project, now recreated in Python wi
 
 * The leaderboard actually works
 * You can right click twice to put a question mark
+* Cross platform (MonkeyX is supposed to be cross-platform, but it was always glitchy/broken on MacOS)
 
 To see the page about this on my website, click [here](https://marleysudbury.github.io/minesweeper).
 
