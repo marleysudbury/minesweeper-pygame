@@ -1,8 +1,13 @@
 # Minesweeper in Pygame
 
-Clone of a clone. My MonkeyX Minesweeper game recreated in Python using Pygame.
+Originally written in MonkeyX for my A level project, now recreated in Python with the Pygame library.
 
 ![Screenshot of game](https://marleysudbury.github.io/minesweeper/screen1.png)
+
+## Improvements on the original
+
+* The leaderboard actually works
+* You can right click twice to put a question mark
 
 To see the page about this on my website, click [here](https://marleysudbury.github.io/minesweeper).
 
