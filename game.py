@@ -17,10 +17,12 @@ class Game:
     def __init__(self):
         """Initialises game objects."""
         pygame.init()
+
         self.W_WIDTH = 600
         self.W_HEIGHT = 500
         self.game_display = pygame.display.set_mode(
             (self.W_WIDTH, self.W_HEIGHT))
+
         pygame.display.set_caption("Minesweeper by Marley")
 
         self.TILE_SIZE = 21
@@ -42,8 +44,8 @@ class Game:
         self.timer = False
         self.start = False
         self.start_time = 0
-        self.time = Counter(30, 15, 0, 0, 0)
-        self.mine_left = Counter(30 + (15 * 5), 15, 0, 0, 0)
+        self.time = Counter(self, 30, 15, 0, 0, 0)
+        self.mine_left = Counter(self, 30 + (15 * 5), 15, 0, 0, 0)
 
         # Used to determine juiciness
         self.tiles_cleared = 0
@@ -60,7 +62,6 @@ class Game:
 
         self.load_leaderboard()
 
-        # self.box = TextBox(self.W_WIDTH/2-65/2, self.W_HEIGHT/2-45/2, 65, 45)
         self.box = None
 
         # Should the current box.get_value() be returned?
@@ -82,8 +83,8 @@ class Game:
                         self.background = self.images["OPTIONS"]
                     elif 275 <= pos[1]:
                         self.background = self.images["LEADERBOARD"]
-                else:
-                    self.background = self.images["PLAY"]
+                    else:
+                        self.background = self.images["PLAY"]
             elif self.game_state == "PLAY":
                 if pos[1] < 187:
                     self.background = self.images["GAME_1"]
@@ -324,37 +325,8 @@ class Game:
                 self.game_display.blit(sprite, (tile.x, tile.y))
 
     def display_counters(self):
-        # Time counter
-        num = self.time.num_1
-        x = self.time.x
-        y = self.time.y
-        self.game_display.blit(self.images[num], (x, y))
-
-        num = self.time.num_2
-        x = self.time.x + 15
-        y = self.time.y
-        self.game_display.blit(self.images[num], (x, y))
-
-        num = self.time.num_3
-        x = self.time.x + 30
-        y = self.time.y
-        self.game_display.blit(self.images[num], (x, y))
-
-        # Mine counter
-        num = self.mine_left.num_1
-        x = self.mine_left.x
-        y = self.mine_left.y
-        self.game_display.blit(self.images[num], (x, y))
-
-        num = self.mine_left.num_2
-        x = self.mine_left.x + 15
-        y = self.mine_left.y
-        self.game_display.blit(self.images[num], (x, y))
-
-        num = self.mine_left.num_3
-        x = self.mine_left.x + 30
-        y = self.mine_left.y
-        self.game_display.blit(self.images[num], (x, y))
+        self.time.draw()
+        self.mine_left.draw()
 
     def start_game(self):
         if self.game_mode == "EASY":
