@@ -83,8 +83,8 @@ class Game:
                         self.background = self.images["OPTIONS"]
                     elif 275 <= pos[1]:
                         self.background = self.images["LEADERBOARD"]
-                    else:
-                        self.background = self.images["PLAY"]
+                else:
+                    self.background = self.images["PLAY"]
             elif self.game_state == "PLAY":
                 if pos[1] < 187:
                     self.background = self.images["GAME_1"]
@@ -307,22 +307,7 @@ class Game:
     def display_tiles(self):
         for row in self.tiles:
             for tile in row:
-                if tile.unsure:
-                    sprite = self.images["QUESTION"]
-                elif tile.flagged:
-                    sprite = self.images["FLAGGED"]
-                elif tile.covered and not self.won:
-                    sprite = self.images["COVERED"]
-                elif tile.exploded:
-                    sprite = self.images["EXPLODED"]
-                elif tile.mine:
-                    sprite = self.images["MINE"]
-                elif tile.adj > 0:
-                    sprite = self.images["T_" + str(tile.adj)]
-                else:
-                    sprite = self.images["UNCOVERED"]
-
-                self.game_display.blit(sprite, (tile.x, tile.y))
+                tile.draw()
 
     def display_counters(self):
         self.time.draw()
@@ -354,7 +339,7 @@ class Game:
             new_row = []
             for j in range(0, self.cols):
                 new_row.append(
-                    Tile(self.grid_x + (self.TILE_SIZE * j), self.grid_y + (self.TILE_SIZE * i)))
+                    Tile(self, self.grid_x + (self.TILE_SIZE * j), self.grid_y + (self.TILE_SIZE * i)))
             self.tiles.append(new_row)
 
     def click_grid(self, type):
