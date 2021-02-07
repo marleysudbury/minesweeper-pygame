@@ -31,20 +31,29 @@ class TextBox:
             return True
 
     def draw(self, parent):
-        font = pygame.font.SysFont(None, 25)
-        caption = font.render("Please enter name:", True, (0, 0, 0))
+        # Draw white background over whole screen
+        background = pygame.Rect(0, 0, parent.W_WIDTH, parent.W_HEIGHT)
+        pygame.draw.rect(parent.game_display, (255, 255, 255), background)
+
+        # Draw text box
+        back_rect = pygame.Rect(self.x, self.y, self.w, self.h)
+        pygame.draw.rect(parent.game_display, (0, 0, 0), back_rect)
+
+        # Draw text input
         img = parent.font.render(self.value, True, (255, 255, 255))
         rect = img.get_rect()
-        back_back_rect = pygame.Rect(0, 0, parent.W_WIDTH, parent.W_HEIGHT)
-        back_rect = pygame.Rect(self.x, self.y, self.w, self.h)
         rect.topleft = (self.x+10, self.y+10)
-        cursor = pygame.Rect(
-            (rect.bottomright[0], rect.bottomright[1]-5), (12, 2))
+        parent.game_display.blit(img, rect)
+
+        # Draw caption on box
+        font = pygame.font.SysFont(None, 25)
+        caption = font.render("Please enter name:", True, (0, 0, 0))
         caption_rect = pygame.Rect(
             (rect.topleft[0]-55, rect.topleft[1]-30), (self.w, self.h))
-        pygame.draw.rect(parent.game_display, (255, 255, 255), back_back_rect)
-        pygame.draw.rect(parent.game_display, (0, 0, 0), back_rect)
         parent.game_display.blit(caption, caption_rect)
+
+        # Blink cursor every half second unless box full
         if time.time() % 1 > 0.5 and not self.too_big():
+            cursor = pygame.Rect(
+                (rect.bottomright[0], rect.bottomright[1]-5), (12, 2))
             pygame.draw.rect(parent.game_display, (255, 255, 255), cursor)
-        parent.game_display.blit(img, rect)
