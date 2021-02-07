@@ -297,12 +297,11 @@ class Game:
                         (i+1, j-1), (i+1, j), (i+1, j+1)]
 
         if self.tiles[i][j].adj == 0:
-            for x in range(0, len(adjacent)):
-                n_t = adjacent[x]
-                if self.tiles[n_t[0]][n_t[1]].covered and not self.tiles[n_t[0]][n_t[1]].flagged:
+            for tile in adjacent:
+                if self.tiles[tile[0]][tile[1]].covered and not self.tiles[tile[0]][tile[1]].flagged:
                     self.tiles_cleared += 1
-                    self.tiles[n_t[0]][n_t[1]].covered = False
-                    self.clearing(n_t)
+                    self.tiles[tile[0]][tile[1]].covered = False
+                    self.clearing(tile)
 
     def display_tiles(self):
         for row in self.tiles:
@@ -348,9 +347,8 @@ class Game:
             # User has clicked inside tile grid
             the_tile = None
             tuple_cov = (0, 0)
-            for i in range(0, len(self.tiles)):
-                for j in range(0, len(self.tiles[i])):
-                    tile = self.tiles[i][j]
+            for i, row in enumerate(self.tiles):
+                for j, tile in enumerate(row):
                     if tile.x <= pos[0] <= tile.x + self.TILE_SIZE and tile.y <= pos[1] <= tile.y + self.TILE_SIZE:
                         the_tile = tile
                         tuple_cov = (i, j)
@@ -406,32 +404,39 @@ class Game:
                 mine_to_place -= 1
 
     def count_adjacent(self):
-        for i in range(0, len(self.tiles)):
-            for j in range(0, len(self.tiles[i])):
-                this_tile = self.tiles[i][j]
+        for i, row in enumerate(self.tiles):
+            for j, tile in enumerate(row):
                 if i == 0 and j == 0:
                     # Top left corner
-                    this_tile.adj += self.check_neighbour(i, j, [4, 5, 6])
+                    tile.adj += self.check_neighbour(i, j, [4, 5, 6])
                 elif i == 0 and j == self.cols - 1:
-                    this_tile.adj += self.check_neighbour(i, j, [6, 7, 8])
+                    # Top right corner
+                    tile.adj += self.check_neighbour(i, j, [6, 7, 8])
                 elif i == self.rows - 1 and j == 0:
-                    this_tile.adj += self.check_neighbour(i, j, [2, 3, 4])
+                    # Bottom left corner
+                    tile.adj += self.check_neighbour(i, j, [2, 3, 4])
                 elif i == self.rows - 1 and j == self.cols - 1:
-                    this_tile.adj += self.check_neighbour(i, j, [1, 2, 8])
+                    # Bottom right corner
+                    tile.adj += self.check_neighbour(i, j, [1, 2, 8])
                 elif i == 0:
-                    this_tile.adj += self.check_neighbour(
+                    # Top side
+                    tile.adj += self.check_neighbour(
                         i, j, [4, 5, 6, 7, 8])
                 elif i == self.rows - 1:
-                    this_tile.adj += self.check_neighbour(
+                    # Bottom side
+                    tile.adj += self.check_neighbour(
                         i, j, [1, 2, 3, 4, 8])
                 elif j == 0:
-                    this_tile.adj += self.check_neighbour(
+                    # Left hand side
+                    tile.adj += self.check_neighbour(
                         i, j, [2, 3, 4, 5, 6])
                 elif j == self.cols - 1:
-                    this_tile.adj += self.check_neighbour(
+                    # Right hand side
+                    tile.adj += self.check_neighbour(
                         i, j, [1, 2, 6, 7, 8])
                 else:
-                    this_tile.adj += self.check_neighbour(i, j)
+                    # Tile with eight neighbours
+                    tile.adj += self.check_neighbour(i, j)
 
     def check_neighbour(self, i, j, n=[1, 2, 3, 4, 5, 6, 7, 8]):
         # 1 to 8 clockwise from top left to left

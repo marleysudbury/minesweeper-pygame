@@ -7,9 +7,9 @@ class Counter:
         self.numbers = [n1, n2, n3]
 
     def draw(self):
-        for i in range(0, 3):
+        for i, number in enumerate(self.numbers):
             self.parent.game_display.blit(
-                self.parent.images[self.numbers[i]], (self.x+(15*i), self.y))
+                self.parent.images[number], (self.x+(15*i), self.y))
 
     def increment(self):
         """Increments the total number of the counter."""
