@@ -1,4 +1,6 @@
 class Tile:
+    """Tile objects make up the game grid."""
+
     def __init__(self, parent, x, y):
         """Initialise tiles."""
         self.parent = parent

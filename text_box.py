@@ -3,6 +3,8 @@ import time
 
 
 class TextBox:
+    """TextBox objects store text typed by the user."""
+
     def __init__(self, x, y, w, h, limit=3):
         """Initialise tiles."""
         self.x = x
@@ -13,9 +15,11 @@ class TextBox:
         self.limit = limit
 
     def get_val(self):
+        """Returns the value of the TextBox."""
         return self.value
 
     def key_response(self, event):
+        """Either deletes letter or adds letter to value."""
         if event.key == pygame.K_BACKSPACE:
             if len(self.value) > 0:
                 self.value = self.value[:-1]
@@ -25,12 +29,15 @@ class TextBox:
                 self.value = self.value.upper()
 
     def too_big(self):
+        """Returns true if the value has reached the assigned limit."""
         if len(self.value) < self.limit:
             return False
         else:
             return True
 
     def draw(self, parent):
+        """Draws the TextBox to the screen."""
+
         # Draw white background over whole screen
         background = pygame.Rect(0, 0, parent.W_WIDTH, parent.W_HEIGHT)
         pygame.draw.rect(parent.game_display, (255, 255, 255), background)

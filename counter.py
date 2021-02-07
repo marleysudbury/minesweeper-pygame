@@ -1,4 +1,6 @@
 class Counter:
+    """Counter objects can store between 0 and 999."""
+
     def __init__(self, parent, x, y, n1, n2, n3):
         """Initialises counters."""
         self.parent = parent
@@ -7,6 +9,7 @@ class Counter:
         self.numbers = [n1, n2, n3]
 
     def draw(self):
+        """Draws the counter on the screen."""
         for i, number in enumerate(self.numbers):
             self.parent.game_display.blit(
                 self.parent.images[number], (self.x+(15*i), self.y))
