@@ -10,6 +10,11 @@ Originally written in MonkeyX for my A level project, now recreated in Python wi
 * You can right click twice to put a question mark
 * Cross platform (MonkeyX is supposed to be cross-platform, but it was always glitchy/broken on MacOS)
 
+## Requires
+
+* Python 3.6.1
+* Pygame 2.0.1
+
 To see the page about this on my website, click [here](https://marleysudbury.github.io/minesweeper).
 
 For original click [here](https://github.com/marleysudbury/Minesweeper).
