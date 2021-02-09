@@ -67,6 +67,9 @@ class Game:
         # Should the current box.get_value() be returned?
         self.return_value = False
 
+        # Global variables for the options menu
+        self.display_done = False  # Display DONE overlay
+
     def loop(self):
         """The game loop."""
         while not self.stop:
@@ -105,12 +108,13 @@ class Game:
             elif self.game_state == "STORY":
                 self.background = self.images["STORY_SCREEN"]
             elif self.game_state == "OPTIONS":
-                if pos[1] < 210:
-                    self.background = self.images["RESET_LEADERBOARD"]
-                elif 210 <= pos[1] < 300:
-                    self.background = self.images["MUTE_SOUND"]
-                else:
-                    self.background = self.images["RETURN_TO_MENU"]
+                if not self.display_done:
+                    if pos[1] < 210:
+                        self.background = self.images["RESET_LEADERBOARD"]
+                    elif 210 <= pos[1] < 300:
+                        self.background = self.images["MUTE_SOUND"]
+                    else:
+                        self.background = self.images["RETURN_TO_MENU"]
             elif self.game_state == "LEADERBOARD":
                 self.background = self.images["LEADERBOARD_SCREEN"]
 
@@ -128,6 +132,8 @@ class Game:
                     self.game_display.blit(self.images["WIN"], (0, 0))
             elif self.game_state == "LEADERBOARD":
                 self.display_leaderboard()
+            elif self.display_done:
+                self.game_display.blit(self.images["DONE_OVERLAY"], (0, 0))
 
             if self.box != None:
                 self.box.draw(self)
@@ -498,10 +504,14 @@ class Game:
                 elif self.game_state == "PLAYING" and not self.won and not self.lost:
                     self.click_grid(event.button)
                 elif self.game_state == "OPTIONS":
-                    if self.background == self.images["RESET_LEADERBOARD"]:
+                    if self.display_done:
+                        self.display_done = False
+                    elif self.background == self.images["RESET_LEADERBOARD"]:
                         self.reset_leaderboard()
+                        self.display_done = True
                     elif self.background == self.images["MUTE_SOUND"]:
-                        print("SHhh")
+                        print("Shhh")
+                        self.display_done = True
                     elif self.background == self.images["RETURN_TO_MENU"]:
                         self.game_state = "MENU"
             if event.type == pygame.KEYDOWN:
@@ -513,6 +523,7 @@ class Game:
                     else:
                         self.box.key_response(event)
                 elif event.key == pygame.K_ESCAPE:
+                    self.display_done = False
                     # Sound effect
                     saying = random.randint(0, 2)
                     if saying == 0:
@@ -619,6 +630,8 @@ class Game:
             str(image_path / "options2.png"))
         self.images["RETURN_TO_MENU"] = pygame.image.load(
             str(image_path / "options3.png"))
+        self.images["DONE_OVERLAY"] = pygame.image.load(
+            str(image_path / "done.png"))
 
         # Leaderboard
         self.images["LEADERBOARD_SCREEN"] = pygame.image.load(
