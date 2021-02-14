@@ -69,6 +69,7 @@ class Game:
 
         # Global variables for the options menu
         self.display_done = False  # Display DONE overlay
+        self.mute = False
 
     def loop(self):
         """The game loop."""
@@ -510,6 +511,13 @@ class Game:
                         self.reset_leaderboard()
                         self.display_done = True
                     elif self.background == self.images["MUTE_SOUND"]:
+                        # pygame.mixer.stop()
+                        if pygame.mixer.get_num_channels() > 0:
+                            pygame.mixer.set_num_channels(0)
+                        else:
+                            pygame.mixer.set_num_channels(8)
+                            self.sounds["music"].play()
+
                         print("Shhh")
                         self.display_done = True
                     elif self.background == self.images["RETURN_TO_MENU"]:
