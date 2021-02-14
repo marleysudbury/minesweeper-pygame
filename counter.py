@@ -21,7 +21,7 @@ class Counter:
         elif self.numbers[1] < 9:
             self.numbers[1] += 1
             self.numbers[2] = 0
-        else:
+        elif self.numbers[0] < 9:
             self.numbers[0] += 1
             self.numbers[1] = 0
             self.numbers[2] = 0
