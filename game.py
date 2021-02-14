@@ -133,8 +133,13 @@ class Game:
                     self.game_display.blit(self.images["WIN"], (0, 0))
             elif self.game_state == "LEADERBOARD":
                 self.display_leaderboard()
-            elif self.display_done:
-                self.game_display.blit(self.images["DONE_OVERLAY"], (0, 0))
+            if self.game_state == "OPTIONS":
+                if self.mute:
+                    self.game_display.blit(self.images["MUTED"], (0, 0))
+                else:
+                    self.game_display.blit(self.images["UNMUTED"], (0, 0))
+                if self.display_done:
+                    self.game_display.blit(self.images["DONE_OVERLAY"], (0, 0))
 
             if self.box != None:
                 self.box.draw(self)
@@ -514,9 +519,11 @@ class Game:
                         # pygame.mixer.stop()
                         if pygame.mixer.get_num_channels() > 0:
                             pygame.mixer.set_num_channels(0)
+                            self.mute = True
                         else:
                             pygame.mixer.set_num_channels(8)
                             self.sounds["music"].play()
+                            self.mute = False
 
                         print("Shhh")
                         self.display_done = True
@@ -640,6 +647,9 @@ class Game:
             str(image_path / "options3.png"))
         self.images["DONE_OVERLAY"] = pygame.image.load(
             str(image_path / "done.png"))
+        self.images["MUTED"] = pygame.image.load(str(image_path / "muted.png"))
+        self.images["UNMUTED"] = pygame.image.load(
+            str(image_path / "unmuted.png"))
 
         # Leaderboard
         self.images["LEADERBOARD_SCREEN"] = pygame.image.load(
