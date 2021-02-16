@@ -5,6 +5,7 @@
 import pygame
 import random
 import time
+import sys
 from tile import Tile
 from counter import Counter
 from text_box import TextBox
@@ -70,6 +71,17 @@ class Game:
         # Global variables for the options menu
         self.display_done = False  # Display DONE overlay
         self.mute = False
+
+        # Process paramaters
+        if len(sys.argv) > 1:
+            if sys.argv[1].lower() == "-quick":
+                self.game_mode = "EASY"
+                if len(sys.argv) > 2:
+                    if sys.argv[2].lower() == "medium":
+                        self.game_mode = "MEDIUM"
+                    elif sys.argv[2].lower() == "hard":
+                        self.game_mode = "HARD"
+                self.start_game()
 
     def loop(self):
         """The game loop."""
@@ -325,6 +337,9 @@ class Game:
         self.mine_left.draw()
 
     def start_game(self):
+        self.game_state = "PLAYING"
+        self.start = True
+
         if self.game_mode == "EASY":
             self.rows = 9
             self.cols = 9
@@ -504,8 +519,6 @@ class Game:
                         self.game_mode = "HARD"
                     else:
                         self.game_mode = "CUSTOM"
-                    self.game_state = "PLAYING"
-                    self.start = True
                     self.start_game()
                 elif self.game_state == "PLAYING" and not self.won and not self.lost:
                     self.click_grid(event.button)
@@ -571,7 +584,6 @@ class Game:
                     self.timer = False
                     self.lost = False
                     self.won = False
-                    self.start = True
                     self.time.set_val(0)
                     self.start_game()
 
