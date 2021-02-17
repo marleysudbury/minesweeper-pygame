@@ -32,8 +32,13 @@ class Game:
         self.stop = False
 
         self.images = {}
-        self.load_images()
-        pygame.display.set_icon(self.images["FLAGGED"])
+        self.image_path = Path("data")
+        pygame.mixer.init()
+        self.sounds = {}
+        self.sound_path = Path("data/tunes")
+        self.load_data_initial()
+        # TODO: Get a propper icon
+        # pygame.display.set_icon(self.images["FLAGGED"])
         self.background = self.images["PLAY"]
 
         self.cols = 0
@@ -48,6 +53,14 @@ class Game:
         self.time = Counter(self, 30, 15, 0, 0, 0)
         self.mine_left = Counter(self, 30 + (15 * 5), 15, 0, 0, 0)
 
+        self.loaded = {
+            "gamemode": False,
+            "game": False,
+            "options": False,
+            "leaderboard": False,
+            "story": False
+        }
+
         # Used to determine juiciness
         self.tiles_cleared = 0
 
@@ -55,9 +68,6 @@ class Game:
         self.lost = False
 
         self.load_fonts()
-        pygame.mixer.init()
-        self.sounds = {}
-        self.load_sounds()
         self.sounds["music"].play(-1)
         self.sounds["explosion1"].play()
 
@@ -503,13 +513,21 @@ class Game:
                     # The user has clicked in the menu!
                     if self.background == self.images["PLAY"]:
                         self.game_state = "PLAY"
+                        if not self.loaded["gamemode"]:
+                            self.load_data_gamemode()
                     elif self.background == self.images["STORY"]:
                         self.game_state = "STORY"
+                        if not self.loaded["story"]:
+                            self.load_data_story()
                     elif self.background == self.images["OPTIONS"]:
+                        if not self.loaded["options"]:
+                            self.load_data_options()
                         self.sounds["vn"].play()
                         self.game_state = "OPTIONS"
                     else:
                         self.game_state = "LEADERBOARD"
+                        if not self.loaded["leaderboard"]:
+                            self.load_data_leaderboard()
                 elif self.game_state == "PLAY":
                     if self.background == self.images["GAME_1"]:
                         self.game_mode = "EASY"
@@ -519,6 +537,9 @@ class Game:
                         self.game_mode = "HARD"
                     else:
                         self.game_mode = "CUSTOM"
+
+                    if not self.loaded["game"]:
+                        self.load_data_game()
                     self.start_game()
                 elif self.game_state == "PLAYING" and not self.won and not self.lost:
                     self.click_grid(event.button)
@@ -587,172 +608,188 @@ class Game:
                     self.time.set_val(0)
                     self.start_game()
 
-    def load_images(self):
-        """Loads all images for the game."""
-
-        image_path = Path("data")
-
+    def load_data_initial(self):
         # Menu options
-        self.images["PLAY"] = pygame.image.load(str(image_path / "play.png"))
-        self.images["STORY"] = pygame.image.load(str(image_path / "story.png"))
+        self.images["PLAY"] = pygame.image.load(
+            str(self.image_path / "play.png"))
+        self.images["STORY"] = pygame.image.load(
+            str(self.image_path / "story.png"))
         self.images["OPTIONS"] = pygame.image.load(
-            str(image_path / "options.png"))
+            str(self.image_path / "options.png"))
         self.images["LEADERBOARD"] = pygame.image.load(
-            str(image_path / "leaderboard.png"))
+            str(self.image_path / "leaderboard.png"))
 
-        # Game type selection
-        self.images["GAME_1"] = pygame.image.load(
-            str(image_path / "gameMode1.png"))
-        self.images["GAME_2"] = pygame.image.load(
-            str(image_path / "gameMode2.png"))
-        self.images["GAME_3"] = pygame.image.load(
-            str(image_path / "gameMode3.png"))
-        self.images["GAME_4"] = pygame.image.load(
-            str(image_path / "gameMode4.png"))
-        self.images["GAME_5"] = pygame.image.load(
-            str(image_path / "gameMode5.png"))
-
-        # Play
-        self.images["GAME_BG"] = pygame.image.load(
-            str(image_path / "blank.png"))
-        self.images["COVERED"] = pygame.image.load(
-            str(image_path / "tiles" / "COVtile.png"))
-        self.images["FLAGGED"] = pygame.image.load(
-            str(image_path / "tiles" / "FLAtile.png"))
-        self.images["UNCOVERED"] = pygame.image.load(
-            str(image_path / "tiles" / "UNCtile.png"))
-        self.images["MINE"] = pygame.image.load(
-            str(image_path / "tiles" / "MINtile.png"))
-        self.images["EXPLODED"] = pygame.image.load(
-            str(image_path / "tiles" / "EXPtile.png"))
-        self.images["QUESTION"] = pygame.image.load(
-            str(image_path / "tiles" / "QUEtile.png"))
-        self.images["T_1"] = pygame.image.load(
-            str(image_path / "tiles" / "1.png"))
-        self.images["T_2"] = pygame.image.load(
-            str(image_path / "tiles" / "2.png"))
-        self.images["T_3"] = pygame.image.load(
-            str(image_path / "tiles" / "3.png"))
-        self.images["T_4"] = pygame.image.load(
-            str(image_path / "tiles" / "4.png"))
-        self.images["T_5"] = pygame.image.load(
-            str(image_path / "tiles" / "5.png"))
-        self.images["T_6"] = pygame.image.load(
-            str(image_path / "tiles" / "6.png"))
-        self.images["T_7"] = pygame.image.load(
-            str(image_path / "tiles" / "7.png"))
-        self.images["T_8"] = pygame.image.load(
-            str(image_path / "tiles" / "8.png"))
-        self.images["WIN"] = pygame.image.load(str(image_path / "won.png"))
-        self.images["LOSE"] = pygame.image.load(str(image_path / "lost.png"))
-
-        # Story
-        self.images["STORY_SCREEN"] = pygame.image.load(
-            str(image_path / "storyS.png"))
-
-        # Options options
-        self.images["RESET_LEADERBOARD"] = pygame.image.load(
-            str(image_path / "options1.png"))
-        self.images["MUTE_SOUND"] = pygame.image.load(
-            str(image_path / "options2.png"))
-        self.images["RETURN_TO_MENU"] = pygame.image.load(
-            str(image_path / "options3.png"))
-        self.images["DONE_OVERLAY"] = pygame.image.load(
-            str(image_path / "done.png"))
-        self.images["MUTED"] = pygame.image.load(str(image_path / "muted.png"))
-        self.images["UNMUTED"] = pygame.image.load(
-            str(image_path / "unmuted.png"))
-
-        # Leaderboard
-        self.images["LEADERBOARD_SCREEN"] = pygame.image.load(
-            str(image_path / "blank.png"))
-
-        # Counter
-        self.images["-"] = pygame.image.load(
-            str(image_path / "nums" / "-.png"))
-        self.images[0] = pygame.image.load(str(image_path / "nums" / "0.png"))
-        self.images[1] = pygame.image.load(str(image_path / "nums" / "1.png"))
-        self.images[2] = pygame.image.load(str(image_path / "nums" / "2.png"))
-        self.images[3] = pygame.image.load(str(image_path / "nums" / "3.png"))
-        self.images[4] = pygame.image.load(str(image_path / "nums" / "4.png"))
-        self.images[5] = pygame.image.load(str(image_path / "nums" / "5.png"))
-        self.images[6] = pygame.image.load(str(image_path / "nums" / "6.png"))
-        self.images[7] = pygame.image.load(str(image_path / "nums" / "7.png"))
-        self.images[8] = pygame.image.load(str(image_path / "nums" / "8.png"))
-        self.images[9] = pygame.image.load(str(image_path / "nums" / "9.png"))
-
-    def load_sounds(self):
         """Loads all sounds for the game."""
-
-        sound_path = Path("data/tunes")
 
         # Music
         self.sounds["music"] = pygame.mixer.Sound(
-            str(sound_path / "music.ogg"))
+            str(self.sound_path / "music.ogg"))
         self.sounds["music"].set_volume(0.2)
-        self.sounds["winMusic"] = pygame.mixer.Sound(
-            str(sound_path / "success.ogg"))
-        self.sounds["winMusic"].set_volume(0.2)
-        self.sounds["gameOver"] = pygame.mixer.Sound(
-            str(sound_path / "gameover.ogg"))
-
-        # Voice overs during gameplay
-        # "Oooh, juicy" - plays when more than 10 tiles are cleared at once
-        self.sounds["juicy"] = pygame.mixer.Sound(
-            str(sound_path / "voice" / "juice.ogg"))
-
-        # Winning remarks
-        # "That's some mighty fine minesweeping"
-        self.sounds["finesweeping"] = pygame.mixer.Sound(
-            str(sound_path / "voice" / "finesweeping.ogg"))
-        # "Good job corpral"
-        self.sounds["goodjob"] = pygame.mixer.Sound(
-            str(sound_path / "voice" / "goodjob.ogg"))
-        # "You did it"
-        self.sounds["youdidit"] = pygame.mixer.Sound(
-            str(sound_path / "voice" / "youdidit.ogg"))
-
-        # Losing remarks
-        # "Grrrrr"
-        self.sounds["grr"] = pygame.mixer.Sound(
-            str(sound_path / "voice" / "grr.ogg"))
-        # "Kraklglslask"
-        self.sounds["merloc"] = pygame.mixer.Sound(
-            str(sound_path / "voice" / "merloc.ogg"))
 
         # Utterances of K_ESCAPE
         # "Think of the children"
         self.sounds["thechildren"] = pygame.mixer.Sound(
-            str(sound_path / "voice" / "thechildren.ogg"))
+            str(self.sound_path / "voice" / "thechildren.ogg"))
         # "Get back to work"
         self.sounds["work"] = pygame.mixer.Sound(
-            str(sound_path / "voice" / "work.ogg"))
+            str(self.sound_path / "voice" / "work.ogg"))
+
+        # Left click "Ugh"
+        self.sounds["click"] = pygame.mixer.Sound(
+            str(self.sound_path / "click.ogg"))
+        # Right click "Brrrrring"
+        self.sounds["rClick"] = pygame.mixer.Sound(
+            str(self.sound_path / "flag.ogg"))
+
+        # Boom!
+        self.sounds["explosion1"] = pygame.mixer.Sound(
+            str(self.sound_path / "explosion-01.ogg"))
+        self.sounds["explosion1"].set_volume(0.2)
+
+    def load_data_gamemode(self):
+        # Game type selection
+        self.images["GAME_1"] = pygame.image.load(
+            str(self.image_path / "gameMode1.png"))
+        self.images["GAME_2"] = pygame.image.load(
+            str(self.image_path / "gameMode2.png"))
+        self.images["GAME_3"] = pygame.image.load(
+            str(self.image_path / "gameMode3.png"))
+        self.images["GAME_4"] = pygame.image.load(
+            str(self.image_path / "gameMode4.png"))
+        self.images["GAME_5"] = pygame.image.load(
+            str(self.image_path / "gameMode5.png"))
+
+        self.loaded["gamemode"] = True
+
+    def load_data_game(self):
+        # Counter
+        self.images["-"] = pygame.image.load(
+            str(self.image_path / "nums" / "-.png"))
+        self.images[0] = pygame.image.load(
+            str(self.image_path / "nums" / "0.png"))
+        self.images[1] = pygame.image.load(
+            str(self.image_path / "nums" / "1.png"))
+        self.images[2] = pygame.image.load(
+            str(self.image_path / "nums" / "2.png"))
+        self.images[3] = pygame.image.load(
+            str(self.image_path / "nums" / "3.png"))
+        self.images[4] = pygame.image.load(
+            str(self.image_path / "nums" / "4.png"))
+        self.images[5] = pygame.image.load(
+            str(self.image_path / "nums" / "5.png"))
+        self.images[6] = pygame.image.load(
+            str(self.image_path / "nums" / "6.png"))
+        self.images[7] = pygame.image.load(
+            str(self.image_path / "nums" / "7.png"))
+        self.images[8] = pygame.image.load(
+            str(self.image_path / "nums" / "8.png"))
+        self.images[9] = pygame.image.load(
+            str(self.image_path / "nums" / "9.png"))
+
+        # Play
+        self.images["GAME_BG"] = pygame.image.load(
+            str(self.image_path / "blank.png"))
+        self.images["COVERED"] = pygame.image.load(
+            str(self.image_path / "tiles" / "COVtile.png"))
+        self.images["FLAGGED"] = pygame.image.load(
+            str(self.image_path / "tiles" / "FLAtile.png"))
+        self.images["UNCOVERED"] = pygame.image.load(
+            str(self.image_path / "tiles" / "UNCtile.png"))
+        self.images["MINE"] = pygame.image.load(
+            str(self.image_path / "tiles" / "MINtile.png"))
+        self.images["EXPLODED"] = pygame.image.load(
+            str(self.image_path / "tiles" / "EXPtile.png"))
+        self.images["QUESTION"] = pygame.image.load(
+            str(self.image_path / "tiles" / "QUEtile.png"))
+        self.images["T_1"] = pygame.image.load(
+            str(self.image_path / "tiles" / "1.png"))
+        self.images["T_2"] = pygame.image.load(
+            str(self.image_path / "tiles" / "2.png"))
+        self.images["T_3"] = pygame.image.load(
+            str(self.image_path / "tiles" / "3.png"))
+        self.images["T_4"] = pygame.image.load(
+            str(self.image_path / "tiles" / "4.png"))
+        self.images["T_5"] = pygame.image.load(
+            str(self.image_path / "tiles" / "5.png"))
+        self.images["T_6"] = pygame.image.load(
+            str(self.image_path / "tiles" / "6.png"))
+        self.images["T_7"] = pygame.image.load(
+            str(self.image_path / "tiles" / "7.png"))
+        self.images["T_8"] = pygame.image.load(
+            str(self.image_path / "tiles" / "8.png"))
+        self.images["WIN"] = pygame.image.load(
+            str(self.image_path / "won.png"))
+        self.images["LOSE"] = pygame.image.load(
+            str(self.image_path / "lost.png"))
+
+        self.sounds["winMusic"] = pygame.mixer.Sound(
+            str(self.sound_path / "success.ogg"))
+        self.sounds["winMusic"].set_volume(0.2)
+        self.sounds["gameOver"] = pygame.mixer.Sound(
+            str(self.sound_path / "gameover.ogg"))
+
+        # Voice overs during gameplay
+        # "Oooh, juicy" - plays when more than 10 tiles are cleared at once
+        self.sounds["juicy"] = pygame.mixer.Sound(
+            str(self.sound_path / "voice" / "juice.ogg"))
+
+        # Winning remarks
+        # "That's some mighty fine minesweeping"
+        self.sounds["finesweeping"] = pygame.mixer.Sound(
+            str(self.sound_path / "voice" / "finesweeping.ogg"))
+        # "Good job corpral"
+        self.sounds["goodjob"] = pygame.mixer.Sound(
+            str(self.sound_path / "voice" / "goodjob.ogg"))
+        # "You did it"
+        self.sounds["youdidit"] = pygame.mixer.Sound(
+            str(self.sound_path / "voice" / "youdidit.ogg"))
+
+        # Losing remarks
+        # "Grrrrr"
+        self.sounds["grr"] = pygame.mixer.Sound(
+            str(self.sound_path / "voice" / "grr.ogg"))
+        # "Kraklglslask"
+        self.sounds["merloc"] = pygame.mixer.Sound(
+            str(self.sound_path / "voice" / "merloc.ogg"))
+
+        # Restart or game over "Aghhh"
+        self.sounds["scream"] = pygame.mixer.Sound(
+            str(self.sound_path / "scream.ogg"))
+
+        self.loaded["game"] = True
+
+    def load_data_options(self):
+        # Options options
+        self.images["RESET_LEADERBOARD"] = pygame.image.load(
+            str(self.image_path / "options1.png"))
+        self.images["MUTE_SOUND"] = pygame.image.load(
+            str(self.image_path / "options2.png"))
+        self.images["RETURN_TO_MENU"] = pygame.image.load(
+            str(self.image_path / "options3.png"))
+        self.images["DONE_OVERLAY"] = pygame.image.load(
+            str(self.image_path / "done.png"))
+        self.images["MUTED"] = pygame.image.load(
+            str(self.image_path / "muted.png"))
+        self.images["UNMUTED"] = pygame.image.load(
+            str(self.image_path / "unmuted.png"))
 
         # "Vape Naysh y'all", options screen
         self.sounds["vn"] = pygame.mixer.Sound(
-            str(sound_path / "voice" / "vn.ogg"))
+            str(self.sound_path / "voice" / "vn.ogg"))
 
-        # Miscellaneous sound effects
-        # Left click "Ugh"
-        self.sounds["click"] = pygame.mixer.Sound(
-            str(sound_path / "click.ogg"))
-        # Right click "Brrrrring"
-        self.sounds["rClick"] = pygame.mixer.Sound(
-            str(sound_path / "flag.ogg"))
-        # Restart or game over "Aghhh"
-        self.sounds["scream"] = pygame.mixer.Sound(
-            str(sound_path / "scream.ogg"))
-        # Boom!
-        self.sounds["explosion1"] = pygame.mixer.Sound(
-            str(sound_path / "explosion-01.ogg"))
-        self.sounds["explosion1"].set_volume(0.2)
-        # I don't think these explosion noises actually go anywhere
-        self.sounds["explosion2"] = pygame.mixer.Sound(
-            str(sound_path / "explosion-02.ogg"))
-        self.sounds["explosion3"] = pygame.mixer.Sound(
-            str(sound_path / "explosion-03.ogg"))
-        self.sounds["explosion4"] = pygame.mixer.Sound(
-            str(sound_path / "explosion-04.ogg"))
+        self.loaded["options"] = True
+
+    def load_data_leaderboard(self):
+        # Leaderboard
+        self.images["LEADERBOARD_SCREEN"] = pygame.image.load(
+            str(self.image_path / "blank.png"))
+        self.loaded["leaderboard"] = True
+
+    def load_data_story(self):
+        # Story
+        self.images["STORY_SCREEN"] = pygame.image.load(
+            str(self.image_path / "storyS.png"))
+        self.loaded["story"] = True
 
     def load_fonts(self):
         """Loads the fonts required for the game."""
