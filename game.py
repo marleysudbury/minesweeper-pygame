@@ -92,6 +92,8 @@ class Game:
                     elif sys.argv[2].lower() == "hard":
                         self.game_mode = "HARD"
                 self.goto_game()
+            if sys.argv[1].lower() == "-touch":
+                self.TILE_SIZE = 33
 
     def loop(self):
         """The game loop."""
@@ -709,32 +711,60 @@ class Game:
             str(self.image_path / "blank.png"))
         self.images["COVERED"] = pygame.image.load(
             str(self.image_path / "tiles" / "COVtile.png"))
+        self.images["COVERED"] = pygame.transform.scale(
+            self.images["COVERED"], (self.TILE_SIZE, self.TILE_SIZE))
         self.images["FLAGGED"] = pygame.image.load(
             str(self.image_path / "tiles" / "FLAtile.png"))
+        self.images["FLAGGED"] = pygame.transform.scale(
+            self.images["FLAGGED"], (self.TILE_SIZE, self.TILE_SIZE))
         self.images["UNCOVERED"] = pygame.image.load(
             str(self.image_path / "tiles" / "UNCtile.png"))
+        self.images["UNCOVERED"] = pygame.transform.scale(
+            self.images["UNCOVERED"], (self.TILE_SIZE, self.TILE_SIZE))
         self.images["MINE"] = pygame.image.load(
             str(self.image_path / "tiles" / "MINtile.png"))
+        self.images["MINE"] = pygame.transform.scale(
+            self.images["MINE"], (self.TILE_SIZE, self.TILE_SIZE))
         self.images["EXPLODED"] = pygame.image.load(
             str(self.image_path / "tiles" / "EXPtile.png"))
+        self.images["EXPLODED"] = pygame.transform.scale(
+            self.images["EXPLODED"], (self.TILE_SIZE, self.TILE_SIZE))
         self.images["QUESTION"] = pygame.image.load(
             str(self.image_path / "tiles" / "QUEtile.png"))
+        self.images["QUESTION"] = pygame.transform.scale(
+            self.images["QUESTION"], (self.TILE_SIZE, self.TILE_SIZE))
         self.images["T_1"] = pygame.image.load(
             str(self.image_path / "tiles" / "1.png"))
+        self.images["T_1"] = pygame.transform.scale(
+            self.images["T_1"], (self.TILE_SIZE, self.TILE_SIZE))
         self.images["T_2"] = pygame.image.load(
             str(self.image_path / "tiles" / "2.png"))
+        self.images["T_2"] = pygame.transform.scale(
+            self.images["T_2"], (self.TILE_SIZE, self.TILE_SIZE))
         self.images["T_3"] = pygame.image.load(
             str(self.image_path / "tiles" / "3.png"))
+        self.images["T_3"] = pygame.transform.scale(
+            self.images["T_3"], (self.TILE_SIZE, self.TILE_SIZE))
         self.images["T_4"] = pygame.image.load(
             str(self.image_path / "tiles" / "4.png"))
+        self.images["T_4"] = pygame.transform.scale(
+            self.images["T_4"], (self.TILE_SIZE, self.TILE_SIZE))
         self.images["T_5"] = pygame.image.load(
             str(self.image_path / "tiles" / "5.png"))
+        self.images["T_5"] = pygame.transform.scale(
+            self.images["T_5"], (self.TILE_SIZE, self.TILE_SIZE))
         self.images["T_6"] = pygame.image.load(
             str(self.image_path / "tiles" / "6.png"))
+        self.images["T_6"] = pygame.transform.scale(
+            self.images["T_6"], (self.TILE_SIZE, self.TILE_SIZE))
         self.images["T_7"] = pygame.image.load(
             str(self.image_path / "tiles" / "7.png"))
+        self.images["T_7"] = pygame.transform.scale(
+            self.images["T_7"], (self.TILE_SIZE, self.TILE_SIZE))
         self.images["T_8"] = pygame.image.load(
             str(self.image_path / "tiles" / "8.png"))
+        self.images["T_8"] = pygame.transform.scale(
+            self.images["T_8"], (self.TILE_SIZE, self.TILE_SIZE))
         self.images["WIN"] = pygame.image.load(
             str(self.image_path / "won.png"))
         self.images["LOSE"] = pygame.image.load(
