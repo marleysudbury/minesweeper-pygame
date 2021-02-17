@@ -91,7 +91,7 @@ class Game:
                         self.game_mode = "MEDIUM"
                     elif sys.argv[2].lower() == "hard":
                         self.game_mode = "HARD"
-                self.start_game()
+                self.goto_game()
 
     def loop(self):
         """The game loop."""
@@ -169,6 +169,36 @@ class Game:
         pygame.quit()
         quit()
 
+    def goto_menu(self):
+        self.game_state = "MENU"
+
+    def goto_gamemode(self):
+        if not self.loaded["gamemode"]:
+            self.load_data_gamemode()
+        self.game_state = "PLAY"
+
+    def goto_game(self):
+        if not self.loaded["game"]:
+            self.load_data_game()
+        self.game_state = "PLAYING"
+        self.start_game()
+
+    def goto_options(self):
+        if not self.loaded["options"]:
+            self.load_data_options()
+        self.game_state = "OPTIONS"
+        self.sounds["vn"].play()
+
+    def goto_story(self):
+        if not self.loaded["story"]:
+            self.load_data_story()
+        self.game_state = "STORY"
+
+    def goto_leaderboard(self):
+        if not self.loaded["leaderboard"]:
+            self.load_data_leaderboard()
+        self.game_state = "LEADERBOARD"
+
     def update_leaderboard(self):
         self.return_value = False
         if self.game_mode == "EASY":
@@ -197,8 +227,8 @@ class Game:
         self.won = False
         self.time.set_val(0)
 
-        self.game_state = "LEADERBOARD"
         self.save_leaderboard()
+        self.goto_leaderboard()
 
     def load_leaderboard(self):
         self.leaderboard = {}
@@ -347,7 +377,6 @@ class Game:
         self.mine_left.draw()
 
     def start_game(self):
-        self.game_state = "PLAYING"
         self.start = True
 
         if self.game_mode == "EASY":
@@ -512,22 +541,13 @@ class Game:
                 if self.game_state == "MENU":
                     # The user has clicked in the menu!
                     if self.background == self.images["PLAY"]:
-                        self.game_state = "PLAY"
-                        if not self.loaded["gamemode"]:
-                            self.load_data_gamemode()
+                        self.goto_gamemode()
                     elif self.background == self.images["STORY"]:
-                        self.game_state = "STORY"
-                        if not self.loaded["story"]:
-                            self.load_data_story()
+                        self.goto_story()
                     elif self.background == self.images["OPTIONS"]:
-                        if not self.loaded["options"]:
-                            self.load_data_options()
-                        self.sounds["vn"].play()
-                        self.game_state = "OPTIONS"
+                        self.goto_options()
                     else:
-                        self.game_state = "LEADERBOARD"
-                        if not self.loaded["leaderboard"]:
-                            self.load_data_leaderboard()
+                        self.goto_leaderboard()
                 elif self.game_state == "PLAY":
                     if self.background == self.images["GAME_1"]:
                         self.game_mode = "EASY"
@@ -538,9 +558,7 @@ class Game:
                     else:
                         self.game_mode = "CUSTOM"
 
-                    if not self.loaded["game"]:
-                        self.load_data_game()
-                    self.start_game()
+                    self.goto_game()
                 elif self.game_state == "PLAYING" and not self.won and not self.lost:
                     self.click_grid(event.button)
                 elif self.game_state == "OPTIONS":
@@ -562,7 +580,7 @@ class Game:
                         print("Shhh")
                         self.display_done = True
                     elif self.background == self.images["RETURN_TO_MENU"]:
-                        self.game_state = "MENU"
+                        self.goto_menu()
             if event.type == pygame.KEYDOWN:
                 if self.box != None:
                     if event.key == pygame.K_ESCAPE:
@@ -592,9 +610,9 @@ class Game:
                         self.lost = False
                         self.won = False
                         self.time.set_val(0)
-                        self.game_state = "PLAY"
+                        self.goto_gamemode()
                     else:
-                        self.game_state = "MENU"
+                        self.goto_menu()
                 elif event.key == pygame.K_r and self.game_state == "PLAYING":
                     if self.won or self.lost:
                         self.sounds["winMusic"].stop()
@@ -606,7 +624,7 @@ class Game:
                     self.lost = False
                     self.won = False
                     self.time.set_val(0)
-                    self.start_game()
+                    self.goto_game()
 
     def load_data_initial(self):
         # Menu options
