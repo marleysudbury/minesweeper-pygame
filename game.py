@@ -82,20 +82,23 @@ class Game:
         self.display_done = False  # Display DONE overlay
         self.mute = False
 
+        self.clock = pygame.time.Clock()
+        self.clock.tick(60)
+
         # Process paramaters
+        arguments = [a.upper() for a in sys.argv]
+
         try:
-            t_index = sys.argv.index("-touch")
+            t_index = arguments.index("-TOUCH")
             self.TILE_SIZE = 33
         except ValueError:
             print("Not touch enabled")
         try:
-            q_index = sys.argv.index("-quick")
+            q_index = arguments.index("-QUICK")
             self.game_mode = "EASY"
-            if len(sys.argv) > q_index + 1:
-                if sys.argv[q_index+1].lower() == "medium":
-                    self.game_mode = "MEDIUM"
-                elif sys.argv[q_index+1].lower() == "hard":
-                    self.game_mode = "HARD"
+            if len(arguments) > q_index + 1:
+                if arguments[q_index+1] in ["MEDIUM", "HARD"]:
+                    self.game_mode = arguments[q_index+1]
             self.goto_game()
         except ValueError:
             print("Not quicklaunch")
