@@ -83,17 +83,42 @@ class Game:
         self.mute = False
 
         # Process paramaters
-        if len(sys.argv) > 1:
-            if sys.argv[1].lower() == "-quick":
-                self.game_mode = "EASY"
-                if len(sys.argv) > 2:
-                    if sys.argv[2].lower() == "medium":
-                        self.game_mode = "MEDIUM"
-                    elif sys.argv[2].lower() == "hard":
-                        self.game_mode = "HARD"
-                self.goto_game()
-            if sys.argv[1].lower() == "-touch":
-                self.TILE_SIZE = 33
+        try:
+            t_index = sys.argv.index("-touch")
+            self.TILE_SIZE = 33
+        except ValueError:
+            print("Not touch enabled")
+        try:
+            q_index = sys.argv.index("-quick")
+            self.game_mode = "EASY"
+            if len(sys.argv) > q_index + 1:
+                if sys.argv[q_index+1].lower() == "medium":
+                    self.game_mode = "MEDIUM"
+                elif sys.argv[q_index+1].lower() == "hard":
+                    self.game_mode = "HARD"
+            self.goto_game()
+        except ValueError:
+            print("Not quicklaunch")
+
+        # if sys.argv.contains("-quick"):
+        #     self.game_mode = "EASY"
+        #     if len(sys.argv) > sys.argv.index("-quick"):
+        #         if sys.argv[2].lower() == "medium":
+        #             self.game_mode = "MEDIUM"
+        #         elif sys.argv[2].lower() == "hard":
+        #             self.game_mode = "HARD"
+        #     self.goto_game()
+        # if len(sys.argv) > 1:
+        #     if sys.argv[1].lower() == "-quick":
+        #         self.game_mode = "EASY"
+        #         if len(sys.argv) > 2:
+        #             if sys.argv[2].lower() == "medium":
+        #                 self.game_mode = "MEDIUM"
+        #             elif sys.argv[2].lower() == "hard":
+        #                 self.game_mode = "HARD"
+        #         self.goto_game()
+        #    if sys.argv[1].lower() == "-touch":
+        #       self.TILE_SIZE = 33
 
     def loop(self):
         """The game loop."""
