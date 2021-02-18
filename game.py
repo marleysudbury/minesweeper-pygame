@@ -57,7 +57,6 @@ class Game:
             "gamemode": False,
             "game": False,
             "options": False,
-            "leaderboard": False,
             "story": False
         }
 
@@ -169,7 +168,7 @@ class Game:
                     else:
                         self.background = self.images["RETURN_TO_MENU"]
             elif self.game_state == "LEADERBOARD":
-                self.background = self.images["LEADERBOARD_SCREEN"]
+                self.background = self.images["GAME_BG"]
 
             if self.return_value:
                 self.update_leaderboard()
@@ -225,8 +224,9 @@ class Game:
         self.game_state = "STORY"
 
     def goto_leaderboard(self):
-        if not self.loaded["leaderboard"]:
-            self.load_data_leaderboard()
+        # The only data needed is the game background
+        if not self.loaded["game"]:
+            self.load_data_game()
         self.game_state = "LEADERBOARD"
 
     def update_leaderboard(self):
@@ -659,13 +659,13 @@ class Game:
     def load_data_initial(self):
         # Menu options
         self.images["PLAY"] = pygame.image.load(
-            str(self.image_path / "play.png"))
+            str(self.image_path / "play.png")).convert_alpha()
         self.images["STORY"] = pygame.image.load(
-            str(self.image_path / "story.png"))
+            str(self.image_path / "story.png")).convert_alpha()
         self.images["OPTIONS"] = pygame.image.load(
-            str(self.image_path / "options.png"))
+            str(self.image_path / "options.png")).convert_alpha()
         self.images["LEADERBOARD"] = pygame.image.load(
-            str(self.image_path / "leaderboard.png"))
+            str(self.image_path / "leaderboard.png")).convert_alpha()
 
         """Loads all sounds for the game."""
 
@@ -697,106 +697,106 @@ class Game:
     def load_data_gamemode(self):
         # Game type selection
         self.images["GAME_1"] = pygame.image.load(
-            str(self.image_path / "gameMode1.png"))
+            str(self.image_path / "gameMode1.png")).convert_alpha()
         self.images["GAME_2"] = pygame.image.load(
-            str(self.image_path / "gameMode2.png"))
+            str(self.image_path / "gameMode2.png")).convert_alpha()
         self.images["GAME_3"] = pygame.image.load(
-            str(self.image_path / "gameMode3.png"))
+            str(self.image_path / "gameMode3.png")).convert_alpha()
         self.images["GAME_4"] = pygame.image.load(
-            str(self.image_path / "gameMode4.png"))
+            str(self.image_path / "gameMode4.png")).convert_alpha()
         self.images["GAME_5"] = pygame.image.load(
-            str(self.image_path / "gameMode5.png"))
+            str(self.image_path / "gameMode5.png")).convert_alpha()
 
         self.loaded["gamemode"] = True
 
     def load_data_game(self):
         # Counter
         self.images["-"] = pygame.image.load(
-            str(self.image_path / "nums" / "-.png"))
+            str(self.image_path / "nums" / "-.png")).convert_alpha()
         self.images[0] = pygame.image.load(
-            str(self.image_path / "nums" / "0.png"))
+            str(self.image_path / "nums" / "0.png")).convert_alpha()
         self.images[1] = pygame.image.load(
-            str(self.image_path / "nums" / "1.png"))
+            str(self.image_path / "nums" / "1.png")).convert_alpha()
         self.images[2] = pygame.image.load(
-            str(self.image_path / "nums" / "2.png"))
+            str(self.image_path / "nums" / "2.png")).convert_alpha()
         self.images[3] = pygame.image.load(
-            str(self.image_path / "nums" / "3.png"))
+            str(self.image_path / "nums" / "3.png")).convert_alpha()
         self.images[4] = pygame.image.load(
-            str(self.image_path / "nums" / "4.png"))
+            str(self.image_path / "nums" / "4.png")).convert_alpha()
         self.images[5] = pygame.image.load(
-            str(self.image_path / "nums" / "5.png"))
+            str(self.image_path / "nums" / "5.png")).convert_alpha()
         self.images[6] = pygame.image.load(
-            str(self.image_path / "nums" / "6.png"))
+            str(self.image_path / "nums" / "6.png")).convert_alpha()
         self.images[7] = pygame.image.load(
-            str(self.image_path / "nums" / "7.png"))
+            str(self.image_path / "nums" / "7.png")).convert_alpha()
         self.images[8] = pygame.image.load(
-            str(self.image_path / "nums" / "8.png"))
+            str(self.image_path / "nums" / "8.png")).convert_alpha()
         self.images[9] = pygame.image.load(
-            str(self.image_path / "nums" / "9.png"))
+            str(self.image_path / "nums" / "9.png")).convert_alpha()
 
         # Play
         self.images["GAME_BG"] = pygame.image.load(
-            str(self.image_path / "blank.png"))
+            str(self.image_path / "blank.png")).convert_alpha()
         self.images["COVERED"] = pygame.image.load(
-            str(self.image_path / "tiles" / "COVtile.png"))
+            str(self.image_path / "tiles" / "COVtile.png")).convert_alpha()
         self.images["COVERED"] = pygame.transform.scale(
             self.images["COVERED"], (self.TILE_SIZE, self.TILE_SIZE))
         self.images["FLAGGED"] = pygame.image.load(
-            str(self.image_path / "tiles" / "FLAtile.png"))
+            str(self.image_path / "tiles" / "FLAtile.png")).convert_alpha()
         self.images["FLAGGED"] = pygame.transform.scale(
             self.images["FLAGGED"], (self.TILE_SIZE, self.TILE_SIZE))
         self.images["UNCOVERED"] = pygame.image.load(
-            str(self.image_path / "tiles" / "UNCtile.png"))
+            str(self.image_path / "tiles" / "UNCtile.png")).convert_alpha()
         self.images["UNCOVERED"] = pygame.transform.scale(
             self.images["UNCOVERED"], (self.TILE_SIZE, self.TILE_SIZE))
         self.images["MINE"] = pygame.image.load(
-            str(self.image_path / "tiles" / "MINtile.png"))
+            str(self.image_path / "tiles" / "MINtile.png")).convert_alpha()
         self.images["MINE"] = pygame.transform.scale(
             self.images["MINE"], (self.TILE_SIZE, self.TILE_SIZE))
         self.images["EXPLODED"] = pygame.image.load(
-            str(self.image_path / "tiles" / "EXPtile.png"))
+            str(self.image_path / "tiles" / "EXPtile.png")).convert_alpha()
         self.images["EXPLODED"] = pygame.transform.scale(
             self.images["EXPLODED"], (self.TILE_SIZE, self.TILE_SIZE))
         self.images["QUESTION"] = pygame.image.load(
-            str(self.image_path / "tiles" / "QUEtile.png"))
+            str(self.image_path / "tiles" / "QUEtile.png")).convert_alpha()
         self.images["QUESTION"] = pygame.transform.scale(
             self.images["QUESTION"], (self.TILE_SIZE, self.TILE_SIZE))
         self.images["T_1"] = pygame.image.load(
-            str(self.image_path / "tiles" / "1.png"))
+            str(self.image_path / "tiles" / "1.png")).convert_alpha()
         self.images["T_1"] = pygame.transform.scale(
             self.images["T_1"], (self.TILE_SIZE, self.TILE_SIZE))
         self.images["T_2"] = pygame.image.load(
-            str(self.image_path / "tiles" / "2.png"))
+            str(self.image_path / "tiles" / "2.png")).convert_alpha()
         self.images["T_2"] = pygame.transform.scale(
             self.images["T_2"], (self.TILE_SIZE, self.TILE_SIZE))
         self.images["T_3"] = pygame.image.load(
-            str(self.image_path / "tiles" / "3.png"))
+            str(self.image_path / "tiles" / "3.png")).convert_alpha()
         self.images["T_3"] = pygame.transform.scale(
             self.images["T_3"], (self.TILE_SIZE, self.TILE_SIZE))
         self.images["T_4"] = pygame.image.load(
-            str(self.image_path / "tiles" / "4.png"))
+            str(self.image_path / "tiles" / "4.png")).convert_alpha()
         self.images["T_4"] = pygame.transform.scale(
             self.images["T_4"], (self.TILE_SIZE, self.TILE_SIZE))
         self.images["T_5"] = pygame.image.load(
-            str(self.image_path / "tiles" / "5.png"))
+            str(self.image_path / "tiles" / "5.png")).convert_alpha()
         self.images["T_5"] = pygame.transform.scale(
             self.images["T_5"], (self.TILE_SIZE, self.TILE_SIZE))
         self.images["T_6"] = pygame.image.load(
-            str(self.image_path / "tiles" / "6.png"))
+            str(self.image_path / "tiles" / "6.png")).convert_alpha()
         self.images["T_6"] = pygame.transform.scale(
             self.images["T_6"], (self.TILE_SIZE, self.TILE_SIZE))
         self.images["T_7"] = pygame.image.load(
-            str(self.image_path / "tiles" / "7.png"))
+            str(self.image_path / "tiles" / "7.png")).convert_alpha()
         self.images["T_7"] = pygame.transform.scale(
             self.images["T_7"], (self.TILE_SIZE, self.TILE_SIZE))
         self.images["T_8"] = pygame.image.load(
-            str(self.image_path / "tiles" / "8.png"))
+            str(self.image_path / "tiles" / "8.png")).convert_alpha()
         self.images["T_8"] = pygame.transform.scale(
             self.images["T_8"], (self.TILE_SIZE, self.TILE_SIZE))
         self.images["WIN"] = pygame.image.load(
-            str(self.image_path / "won.png"))
+            str(self.image_path / "won.png")).convert_alpha()
         self.images["LOSE"] = pygame.image.load(
-            str(self.image_path / "lost.png"))
+            str(self.image_path / "lost.png")).convert_alpha()
 
         self.sounds["winMusic"] = pygame.mixer.Sound(
             str(self.sound_path / "success.ogg"))
@@ -837,17 +837,17 @@ class Game:
     def load_data_options(self):
         # Options options
         self.images["RESET_LEADERBOARD"] = pygame.image.load(
-            str(self.image_path / "options1.png"))
+            str(self.image_path / "options1.png")).convert_alpha()
         self.images["MUTE_SOUND"] = pygame.image.load(
-            str(self.image_path / "options2.png"))
+            str(self.image_path / "options2.png")).convert_alpha()
         self.images["RETURN_TO_MENU"] = pygame.image.load(
-            str(self.image_path / "options3.png"))
+            str(self.image_path / "options3.png")).convert_alpha()
         self.images["DONE_OVERLAY"] = pygame.image.load(
-            str(self.image_path / "done.png"))
+            str(self.image_path / "done.png")).convert_alpha()
         self.images["MUTED"] = pygame.image.load(
-            str(self.image_path / "muted.png"))
+            str(self.image_path / "muted.png")).convert_alpha()
         self.images["UNMUTED"] = pygame.image.load(
-            str(self.image_path / "unmuted.png"))
+            str(self.image_path / "unmuted.png")).convert_alpha()
 
         # "Vape Naysh y'all", options screen
         self.sounds["vn"] = pygame.mixer.Sound(
@@ -855,16 +855,16 @@ class Game:
 
         self.loaded["options"] = True
 
-    def load_data_leaderboard(self):
-        # Leaderboard
-        self.images["LEADERBOARD_SCREEN"] = pygame.image.load(
-            str(self.image_path / "blank.png"))
-        self.loaded["leaderboard"] = True
+    # def load_data_leaderboard(self):
+    #     # Leaderboard
+    #     self.images["LEADERBOARD_SCREEN"] = pygame.image.load(
+    #         str(self.image_path / "blank.png")).convert_alpha()
+    #     self.loaded["leaderboard"] = True
 
     def load_data_story(self):
         # Story
         self.images["STORY_SCREEN"] = pygame.image.load(
-            str(self.image_path / "storyS.png"))
+            str(self.image_path / "storyS.png")).convert_alpha()
         self.loaded["story"] = True
 
     def load_fonts(self):
