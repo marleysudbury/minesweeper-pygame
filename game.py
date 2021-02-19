@@ -855,12 +855,6 @@ class Game:
 
         self.loaded["options"] = True
 
-    # def load_data_leaderboard(self):
-    #     # Leaderboard
-    #     self.images["LEADERBOARD_SCREEN"] = pygame.image.load(
-    #         str(self.image_path / "blank.png")).convert_alpha()
-    #     self.loaded["leaderboard"] = True
-
     def load_data_story(self):
         # Story
         self.images["STORY_SCREEN"] = pygame.image.load(
