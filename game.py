@@ -88,10 +88,17 @@ class Game:
         arguments = [a.upper() for a in sys.argv]
         
         self.touch = False
+        # Variable to store the tile being pressed by user
+        self.tile_to_action = None
+        # Variable to store the time at which they pressed the tile
+        self.touch_time = 0
 
         try:
+            # If the -touch flag was used
             t_index = arguments.index("-TOUCH")
+            # Increase the tile size
             self.TILE_SIZE = 33
+            # TODO: Is this variable used?
             self.touch = True
         except ValueError:
             print("Not touch enabled")
@@ -421,10 +428,9 @@ class Game:
                     Tile(self, self.grid_x + (self.TILE_SIZE * j), self.grid_y + (self.TILE_SIZE * i)))
             self.tiles.append(new_row)
 
-    def click_grid(self, type):
+    def get_tile(self):
         pos = pygame.mouse.get_pos()
         if self.tiles[0][0].x <= pos[0] <= self.tiles[0][self.cols-1].x + self.TILE_SIZE and self.tiles[0][0].y <= pos[1] <= self.tiles[self.rows-1][self.cols-1].y + self.TILE_SIZE:
-            # User has clicked inside tile grid
             the_tile = None
             tuple_cov = (0, 0)
             for i, row in enumerate(self.tiles):
@@ -432,50 +438,66 @@ class Game:
                     if tile.x <= pos[0] <= tile.x + self.TILE_SIZE and tile.y <= pos[1] <= tile.y + self.TILE_SIZE:
                         the_tile = tile
                         tuple_cov = (i, j)
+                        
+            return (the_tile, tuple_cov)
+        else:
+            return None
 
-            if self.start:
-                (i, j) = tuple_cov
-                self.place_mines(i, j)
-                self.count_adjacent()
-                self.start = False
-                self.timer = True
-                self.start_time = time.time()
-            if type == 1:
-                # Handle clicks under -touch
-                if touch:
-                    #TODO
-                # Uncover tile if not flagged
-                if not the_tile.flagged:
-                    the_tile.covered = False
-                    if the_tile.mine:
-                        the_tile.exploded = True
-                        self.lose()
-                    else:
-                        self.tiles_cleared = 0
-                        self.clearing(tuple_cov)
-                        if self.tiles_cleared > 10:
-                            self.sounds["juicy"].play()
-            else:
-                # Toggle flag (unless it is already uncovered)
-                if the_tile.covered:
-                    # the_tile.flagged = not the_tile.flagged
-                    if the_tile.flagged and not the_tile.unsure:
-                        the_tile.unsure = True
-                        self.mine_left.increment()
-                    elif the_tile.flagged:
-                        the_tile.flagged = False
-                        the_tile.unsure = False
-                    else:
-                        the_tile.flagged = True
-                        self.mine_left.decrement()
-                        if self.mine_left.get_val() == 0:
-                            correct = True
-                            for row in self.tiles:
-                                for tile in row:
-                                    if tile.mine and not tile.flagged or not tile.mine and tile.flagged and not tile.unsure:
-                                        correct = False
-                            if correct:
-                                self.win()
+    def click_grid(self, type):
+        if self.get_tile() != None:
+            # User has clicked inside tile grid
+            the_tile, tuple_cov = self.get_tile()
+            
+            # Handle clicks under -touch
+            if self.touch:
+                self.tile_to_action = the_tile
+                self.touch_time = time.time()
+                return
+            
+            self.click_grid_2(type)
+                                
+    def click_grid_2(self, type):
+        the_tile, tuple_cov = self.get_tile()
+        if self.start:
+            (i, j) = tuple_cov
+            self.place_mines(i, j)
+            self.count_adjacent()
+            self.start = False
+            self.timer = True
+            self.start_time = time.time()
+        if type == 1:
+            # Uncover tile if not flagged
+            if not the_tile.flagged:
+                the_tile.covered = False
+                if the_tile.mine:
+                    the_tile.exploded = True
+                    self.lose()
+                else:
+                    self.tiles_cleared = 0
+                    self.clearing(tuple_cov)
+                    if self.tiles_cleared > 10:
+                        self.sounds["juicy"].play()
+        else:
+            # Toggle flag (unless it is already uncovered)
+            if the_tile.covered:
+                # the_tile.flagged = not the_tile.flagged
+                if the_tile.flagged and not the_tile.unsure:
+                    the_tile.unsure = True
+                    self.mine_left.increment()
+                elif the_tile.flagged:
+                    the_tile.flagged = False
+                    the_tile.unsure = False
+                else:
+                    the_tile.flagged = True
+                    self.mine_left.decrement()
+                    if self.mine_left.get_val() == 0:
+                        correct = True
+                        for row in self.tiles:
+                            for tile in row:
+                                if tile.mine and not tile.flagged or not tile.mine and tile.flagged and not tile.unsure:
+                                    correct = False
+                        if correct:
+                            self.win()
 
     def place_mines(self, i, j):
         mine_to_place = self.mines
@@ -598,6 +620,17 @@ class Game:
                         self.display_done = True
                     elif self.background == self.images["RETURN_TO_MENU"]:
                         self.goto_menu()
+            if event.type == pygame.MOUSEBUTTONUP:
+                if self.tile_to_action != None:
+                    current_time = time.time()
+                    if current_time - self.touch_time > 0.5:
+                        type = 2
+                    else:
+                        type = 1
+                    
+                    self.click_grid_2(type)
+                    self.tile_to_action = None
+            
             if event.type == pygame.KEYDOWN:
                 if self.box != None:
                     if event.key == pygame.K_ESCAPE:
