@@ -86,10 +86,13 @@ class Game:
 
         # Process paramaters
         arguments = [a.upper() for a in sys.argv]
+        
+        self.touch = False
 
         try:
             t_index = arguments.index("-TOUCH")
             self.TILE_SIZE = 33
+            self.touch = True
         except ValueError:
             print("Not touch enabled")
         try:
@@ -101,26 +104,6 @@ class Game:
             self.goto_game()
         except ValueError:
             print("Not quicklaunch")
-
-        # if sys.argv.contains("-quick"):
-        #     self.game_mode = "EASY"
-        #     if len(sys.argv) > sys.argv.index("-quick"):
-        #         if sys.argv[2].lower() == "medium":
-        #             self.game_mode = "MEDIUM"
-        #         elif sys.argv[2].lower() == "hard":
-        #             self.game_mode = "HARD"
-        #     self.goto_game()
-        # if len(sys.argv) > 1:
-        #     if sys.argv[1].lower() == "-quick":
-        #         self.game_mode = "EASY"
-        #         if len(sys.argv) > 2:
-        #             if sys.argv[2].lower() == "medium":
-        #                 self.game_mode = "MEDIUM"
-        #             elif sys.argv[2].lower() == "hard":
-        #                 self.game_mode = "HARD"
-        #         self.goto_game()
-        #    if sys.argv[1].lower() == "-touch":
-        #       self.TILE_SIZE = 33
 
     def loop(self):
         """The game loop."""
@@ -183,7 +166,8 @@ class Game:
                 elif self.won:
                     self.game_display.blit(self.images["WIN"], (0, 0))
             elif self.game_state == "LEADERBOARD":
-                self.display_leaderboard()
+                #self.display_leaderboard()
+                self.leaderboard.draw()
             if self.game_state == "OPTIONS":
                 if self.mute:
                     self.game_display.blit(self.images["MUTED"], (0, 0))
@@ -457,6 +441,9 @@ class Game:
                 self.timer = True
                 self.start_time = time.time()
             if type == 1:
+                # Handle clicks under -touch
+                if touch:
+                    #TODO
                 # Uncover tile if not flagged
                 if not the_tile.flagged:
                     the_tile.covered = False
