@@ -250,7 +250,7 @@ class Game:
 
         self.sounds["winMusic"].stop()
         self.sounds["gameOver"].stop()
-        self.sounds["music"].play()
+        self.sounds["music"].play(-1)
 
         self.timer = False
         self.lost = False
@@ -421,6 +421,10 @@ class Game:
             self.rows = 20
             self.cols = 27
             self.mines = 101
+        elif self.game_mode == "CUSTOM":
+            self.rows = 24
+            self.cols = 32
+            self.mines = 256
 
         self.mine_left.set_val(self.mines)
 
@@ -604,7 +608,7 @@ class Game:
                             self.mute = True
                         else:
                             pygame.mixer.set_num_channels(8)
-                            self.sounds["music"].play()
+                            self.sounds["music"].play(-1)
                             self.mute = False
 
                         print("Shhh")
@@ -634,7 +638,7 @@ class Game:
                         if self.won or self.lost:
                             self.sounds["winMusic"].stop()
                             self.sounds["gameOver"].stop()
-                            self.sounds["music"].play()
+                            self.sounds["music"].play(-1)
 
                         self.timer = False
                         self.lost = False
@@ -647,7 +651,7 @@ class Game:
                     if self.won or self.lost:
                         self.sounds["winMusic"].stop()
                         self.sounds["gameOver"].stop()
-                        self.sounds["music"].play()
+                        self.sounds["music"].play(-1)
 
                     self.sounds["scream"].play()
                     self.timer = False
