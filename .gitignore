@@ -1,9 +1,10 @@
+# System files
 .DS_Store
 
 # Game files
 data/leader.txt
 
-# # Idea
+# Idea
 .idea/
 
 # Byte-compiled / optimized / DLL files
