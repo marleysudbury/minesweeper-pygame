@@ -2,7 +2,7 @@
 
 Originally written in MonkeyX for my A level project, now recreated in Python with the Pygame library.
 
-![Screenshot of game](https://marleysudbury.github.io/minesweeper/screen1.png)
+![Screenshot of game](https://marleysudbury.github.io/minesweeper/screen_py.png)
 
 ## Improvements on the original
 
