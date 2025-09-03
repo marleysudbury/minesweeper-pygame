@@ -1,9 +1,6 @@
 # System files
 .DS_Store
 
-# Game files
-data/leader.txt
-
 # Idea
 .idea/
 
