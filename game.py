@@ -2,6 +2,10 @@
 # Same assets and mostly the same logic
 # (c) Marley Sudbury 2019
 
+# Hide Pygame ad
+import os
+os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "True"
+
 import pygame
 import random
 import time
@@ -91,7 +95,8 @@ class Game:
             t_index = arguments.index("-TOUCH")
             self.TILE_SIZE = 33
         except ValueError:
-            print("Not touch enabled")
+            pass
+            # print("Not touch enabled")
         try:
             q_index = arguments.index("-QUICK")
             self.game_mode = "EASY"
@@ -100,7 +105,8 @@ class Game:
                     self.game_mode = arguments[q_index+1]
             self.goto_game()
         except ValueError:
-            print("Not quicklaunch")
+            pass
+            # print("Not quicklaunch")
 
         # if sys.argv.contains("-quick"):
         #     self.game_mode = "EASY"
@@ -316,7 +322,7 @@ class Game:
             if self.time.get_val() < int(self.leaderboard[2][1]):
                 self.get_name()
         if self.game_mode == "CONCENTRIC":
-            print("hmm")
+            print("This game mode is not yet implemented.")
 
         for row in self.tiles:
             for tile in row:
@@ -611,7 +617,7 @@ class Game:
                             self.sounds["music"].play(-1)
                             self.mute = False
 
-                        print("Shhh")
+                        # print("Shhh")
                         self.display_done = True
                     elif self.background == self.images["RETURN_TO_MENU"]:
                         self.goto_menu()
