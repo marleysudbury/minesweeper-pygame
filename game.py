@@ -96,7 +96,7 @@ class Game:
 
         # Process paramaters
         arguments = [a.upper() for a in sys.argv]
-        
+
         self.touch = False
         # Variable to store the tile being pressed by user
         self.tile_to_action = None
@@ -112,7 +112,7 @@ class Game:
             self.touch = True
         except ValueError:
             pass
-            # print("Not touch enabled")
+
         try:
             q_index = arguments.index("-QUICK")
             self.game_mode = "EASY"
@@ -122,7 +122,6 @@ class Game:
             self.goto_game()
         except ValueError:
             pass
-            # print("Not quicklaunch")
 
     def loop(self):
         """The game loop."""
@@ -292,6 +291,7 @@ class Game:
             self.sounds["merloc"].play()
 
     def clearing(self, t):
+        self.check_win()
         (i, j) = t
         if i == 0 and j == 0:
             # Top left
@@ -393,7 +393,7 @@ class Game:
                     if tile.x <= pos[0] <= tile.x + self.TILE_SIZE and tile.y <= pos[1] <= tile.y + self.TILE_SIZE:
                         the_tile = tile
                         tuple_cov = (i, j)
-                        
+
             return (the_tile, tuple_cov)
         else:
             return None
@@ -402,15 +402,15 @@ class Game:
         if self.get_tile() != None:
             # User has clicked inside tile grid
             the_tile, tuple_cov = self.get_tile()
-            
+
             # Handle clicks under -touch
             if self.touch:
                 self.tile_to_action = the_tile
                 self.touch_time = time.time()
                 return
-            
+
             self.click_grid_2(type)
-                                
+
     def click_grid_2(self, type):
         the_tile, tuple_cov = self.get_tile()
         if self.start:
@@ -446,13 +446,17 @@ class Game:
                     the_tile.flagged = True
                     self.mine_left.decrement()
                     if self.mine_left.get_val() == 0:
-                        correct = True
-                        for row in self.tiles:
-                            for tile in row:
-                                if tile.mine and not tile.flagged or not tile.mine and tile.flagged and not tile.unsure:
-                                    correct = False
-                        if correct:
-                            self.win()
+                        self.check_win()
+
+    def check_win(self):
+        correct = True
+        for row in self.tiles:
+            for tile in row:
+                #if tile.mine and not tile.flagged or not tile.mine and tile.flagged and not tile.unsure:
+                if not tile.mine and tile.covered:
+                    correct = False
+        if correct:
+            self.win()
 
     def place_mines(self, i, j):
         mine_to_place = self.mines
