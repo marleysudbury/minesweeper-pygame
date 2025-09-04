@@ -9,6 +9,7 @@ import sys
 from tile import Tile
 from counter import Counter
 from text_box import TextBox
+from leaderboard import Leaderboard
 from pathlib import Path
 
 
@@ -24,19 +25,23 @@ class Game:
         self.game_display = pygame.display.set_mode(
             (self.W_WIDTH, self.W_HEIGHT))
 
+        # Title of window
         pygame.display.set_caption("Minesweeper by Marley")
 
+        # The size in pixels of each tile in the Minesweeper gird
         self.TILE_SIZE = 21
         self.game_state = "MENU"
         self.game_mode = "EASY"
         self.stop = False
 
+        # Images and sound files are stored in dictionairies
         self.images = {}
         self.image_path = Path("data")
         pygame.mixer.init()
         self.sounds = {}
         self.sound_path = Path("data/tunes")
         self.load_data_initial()
+
         # TODO: Get a propper icon
         # pygame.display.set_icon(self.images["FLAGGED"])
         self.background = self.images["PLAY"]
@@ -70,7 +75,8 @@ class Game:
         self.sounds["music"].play(-1)
         self.sounds["explosion1"].play()
 
-        self.load_leaderboard()
+        self.leaderboard = Leaderboard(self)
+        self.leaderboard.load()
 
         self.box = None
 
@@ -221,74 +227,24 @@ class Game:
         self.game_state = "LEADERBOARD"
 
     def update_leaderboard(self):
-        self.return_value = False
-        if self.game_mode == "EASY":
-            if self.time.get_val() < int(self.leaderboard[0][1]):
-                self.leaderboard[0][0] = self.box.get_val()
-                self.leaderboard[0][1] = "{:0>3}".format(self.time.get_val())
-        if self.game_mode == "MEDIUM":
-            if self.time.get_val() < int(self.leaderboard[1][1]):
-                self.get_name()
-                self.leaderboard[1][0] = self.box.get_val()
-                self.leaderboard[1][1] = "{:0>3}".format(self.time.get_val())
-        if self.game_mode == "HARD":
-            if self.time.get_val() < int(self.leaderboard[2][1]):
-                self.get_name()
-                self.leaderboard[2][0] = self.box.get_val()
-                self.leaderboard[2][1] = "{:0>3}".format(self.time.get_val())
+        if self.return_value:
+            self.return_value = False
+            self.leaderboard.update(self.game_mode, self.box.get_val(), "{:0>3}".format(self.time.get_val()))
+            self.box = None
 
-        self.box = None
+            self.sounds["winMusic"].stop()
+            self.sounds["gameOver"].stop()
+            self.sounds["music"].play()
 
-        self.sounds["winMusic"].stop()
-        self.sounds["gameOver"].stop()
-        self.sounds["music"].play()
+            self.timer = False
+            self.lost = False
+            self.won = False
+            self.time.set_val(0)
 
-        self.timer = False
-        self.lost = False
-        self.won = False
-        self.time.set_val(0)
-
-        self.save_leaderboard()
-        self.goto_leaderboard()
-
-    def load_leaderboard(self):
-        self.leaderboard = {}
-        lb_file = open('data/leader.txt')
-        text = lb_file.read().split('\n')
-        for i in range(0, len(text)):
-            self.leaderboard[i] = text[i].split(',')
-
-        lb_file.close()
-
-    def save_leaderboard(self):
-        text = ''
-        for i in range(0, 4):
-            text += '{},{}\n'.format(self.leaderboard[i][0],
-                                     self.leaderboard[i][1])
-        lb_file = open('data/leader.txt', 'w')
-        lb_file.write(text)
-        lb_file.close()
-
-    def reset_leaderboard(self):
-        text = '???,999\n???,999\n???,999\n???,0'
-        lb_file = open('data/leader.txt', 'w')
-        lb_file.write(text)
-        lb_file.close()
-        self.load_leaderboard()
-
-    def display_leaderboard(self):
-        easy = self.font.render('{:<12}{:<10}{}'.format(
-            'Easy', self.leaderboard[0][0], self.leaderboard[0][1]), True, (255, 0, 0))
-        medium = self.font.render(
-            '{:<12}{:<10}{}'.format('Medium', self.leaderboard[1][0], self.leaderboard[1][1]), True, (255, 0, 0))
-        hard = self.font.render('{:<12}{:<10}{}'.format(
-            'Hard', self.leaderboard[2][0], self.leaderboard[2][1]), True, (255, 0, 0))
-        concentric = self.font.render(
-            '{:<12}{}{:>10}'.format('Concentric', self.leaderboard[3][0], ' stage ' + self.leaderboard[3][1]), True, (255, 0, 0))
-        self.game_display.blit(easy, (50, 90))
-        self.game_display.blit(medium, (50, 120))
-        self.game_display.blit(hard, (50, 150))
-        self.game_display.blit(concentric, (50, 180))
+            self.leaderboard.save()
+            self.goto_leaderboard()
+        elif int(self.time.get_val()) < int(self.leaderboard.leaderboard[self.game_mode.lower()][1]):
+            self.get_name()
 
     def get_name(self):
         self.box = TextBox(self.W_WIDTH/2-65/2, self.W_HEIGHT/2-45/2, 65, 45)
@@ -297,17 +253,7 @@ class Game:
         # TODO: refactor the heck out of this plz
         self.won = True
         self.timer = False
-        if self.game_mode == "EASY":
-            if self.time.get_val() < int(self.leaderboard[0][1]):
-                self.get_name()
-        if self.game_mode == "MEDIUM":
-            if self.time.get_val() < int(self.leaderboard[1][1]):
-                self.get_name()
-        if self.game_mode == "HARD":
-            if self.time.get_val() < int(self.leaderboard[2][1]):
-                self.get_name()
-        if self.game_mode == "CONCENTRIC":
-            print("hmm")
+        self.update_leaderboard()
 
         for row in self.tiles:
             for tile in row:
@@ -604,7 +550,7 @@ class Game:
                     if self.display_done:
                         self.display_done = False
                     elif self.background == self.images["RESET_LEADERBOARD"]:
-                        self.reset_leaderboard()
+                        self.leaderboard.reset()
                         self.display_done = True
                     elif self.background == self.images["MUTE_SOUND"]:
                         # pygame.mixer.stop()
@@ -616,7 +562,6 @@ class Game:
                             self.sounds["music"].play()
                             self.mute = False
 
-                        print("Shhh")
                         self.display_done = True
                     elif self.background == self.images["RETURN_TO_MENU"]:
                         self.goto_menu()
