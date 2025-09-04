@@ -1,5 +1,5 @@
 class Counter:
-    """Counter objects can store between 0 and 999."""
+    """Counter objects can store integers between -99 and 999."""
 
     def __init__(self, parent, x, y, n1, n2, n3):
         """Initialises counters."""
@@ -16,38 +16,76 @@ class Counter:
 
     def increment(self):
         """Increments the total number of the counter."""
-        if self.numbers[2] < 9:
-            self.numbers[2] += 1
-        elif self.numbers[1] < 9:
-            self.numbers[1] += 1
-            self.numbers[2] = 0
-        elif self.numbers[0] < 9:
-            self.numbers[0] += 1
-            self.numbers[1] = 0
-            self.numbers[2] = 0
+        if self.numbers[0] == "-":
+            # Negative number
+            if self.numbers[1] == 0 and self.numbers[2] == 1:
+                # Go from -1 to 0
+                self.numbers[0] = 0
+                self.numbers[1] = 0
+                self.numbers[2] = 0
+            else:
+                if self.numbers[2] > 0:
+                    self.numbers[2] -= 1
+                elif self.numbers[1] > 0:
+                    self.numbers[1] -= 1
+                    self.numbers[2] = 9
+
+        else:
+            if self.numbers[2] < 9:
+                self.numbers[2] += 1
+            elif self.numbers[1] < 9:
+                self.numbers[1] += 1
+                self.numbers[2] = 0
+            elif self.numbers[0] < 9:
+                self.numbers[0] += 1
+                self.numbers[1] = 0
+                self.numbers[2] = 0
 
     def decrement(self):
         """Decrements the total number of the counter."""
-        if self.numbers[2] > 0:
-            self.numbers[2] -= 1
-        elif self.numbers[1] > 0:
-            self.numbers[1] -= 1
-            self.numbers[2] = 9
-        elif self.numbers[0] > 0:
-            self.numbers[0] -= 1
-            self.numbers[1] = 9
-            self.numbers[2] = 9
+        if self.numbers[0] == "-":
+            # Negative number
+            if self.numbers[2] < 9:
+                self.numbers[2] += 1
+            elif self.numbers[1] < 9:
+                self.numbers[1] += 1
+                self.numbers[2] = 0
+        else:
+            if self.numbers[0] == 0 and self.numbers[1] == 0 and self.numbers[2] == 0:
+                # Go from 0 to -1
+                self.numbers[0] = "-"
+                self.numbers[1] = 0
+                self.numbers[2] = 1
+            else:
+                if self.numbers[2] > 0:
+                    self.numbers[2] -= 1
+                elif self.numbers[1] > 0:
+                    self.numbers[1] -= 1
+                    self.numbers[2] = 9
+                elif self.numbers[0] > 0:
+                    self.numbers[0] -= 1
+                    self.numbers[1] = 9
+                    self.numbers[2] = 9
 
     def get_val(self):
         """Returns the value of the counter."""
-        total_val = self.numbers[0] * 100
-        total_val += self.numbers[1] * 10
-        total_val += self.numbers[2]
-        return total_val
+        if self.numbers[0] == "-":
+            # Negative number
+            total_val = self.numbers[1] * 10
+            total_val += self.numbers[2]
+            return 0 - total_val
+        else:
+            total_val = self.numbers[0] * 100
+            total_val += self.numbers[1] * 10
+            total_val += self.numbers[2]
+            return total_val
 
     def set_val(self, aim):
         """Sets the value of the counter"""
-        while aim > self.get_val():
-            self.increment()
-        while self.get_val() > aim:
-            self.decrement()
+        if aim > 999 or aim < -99:
+            raise ValueError("Counters cannot have values outside the range -99 to 999")
+        else:
+            while aim > self.get_val():
+                self.increment()
+            while self.get_val() > aim:
+                self.decrement()

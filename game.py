@@ -2,6 +2,10 @@
 # Same assets and mostly the same logic
 # (c) Marley Sudbury 2019
 
+# Hide Pygame ad
+import os
+os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "True"
+
 import pygame
 import random
 import time
@@ -107,7 +111,8 @@ class Game:
             # TODO: Is this variable used?
             self.touch = True
         except ValueError:
-            print("Not touch enabled")
+            pass
+            # print("Not touch enabled")
         try:
             q_index = arguments.index("-QUICK")
             self.game_mode = "EASY"
@@ -116,7 +121,8 @@ class Game:
                     self.game_mode = arguments[q_index+1]
             self.goto_game()
         except ValueError:
-            print("Not quicklaunch")
+            pass
+            # print("Not quicklaunch")
 
     def loop(self):
         """The game loop."""
@@ -234,7 +240,7 @@ class Game:
 
             self.sounds["winMusic"].stop()
             self.sounds["gameOver"].stop()
-            self.sounds["music"].play()
+            self.sounds["music"].play(-1)
 
             self.timer = False
             self.lost = False
@@ -254,7 +260,6 @@ class Game:
         self.won = True
         self.timer = False
         self.update_leaderboard()
-
         for row in self.tiles:
             for tile in row:
                 if tile.covered and not tile.mine:
@@ -358,6 +363,10 @@ class Game:
             self.rows = 20
             self.cols = 27
             self.mines = 101
+        elif self.game_mode == "CUSTOM":
+            self.rows = 24
+            self.cols = 32
+            self.mines = 256
 
         self.mine_left.set_val(self.mines)
 
@@ -559,7 +568,7 @@ class Game:
                             self.mute = True
                         else:
                             pygame.mixer.set_num_channels(8)
-                            self.sounds["music"].play()
+                            self.sounds["music"].play(-1)
                             self.mute = False
 
                         self.display_done = True
@@ -599,7 +608,7 @@ class Game:
                         if self.won or self.lost:
                             self.sounds["winMusic"].stop()
                             self.sounds["gameOver"].stop()
-                            self.sounds["music"].play()
+                            self.sounds["music"].play(-1)
 
                         self.timer = False
                         self.lost = False
@@ -612,7 +621,7 @@ class Game:
                     if self.won or self.lost:
                         self.sounds["winMusic"].stop()
                         self.sounds["gameOver"].stop()
-                        self.sounds["music"].play()
+                        self.sounds["music"].play(-1)
 
                     self.sounds["scream"].play()
                     self.timer = False
