@@ -64,3 +64,4 @@ class TextBox:
             cursor = pygame.Rect(
                 (rect.bottomright[0], rect.bottomright[1]-5), (12, 2))
             pygame.draw.rect(parent.game_display, (255, 255, 255), cursor)
+

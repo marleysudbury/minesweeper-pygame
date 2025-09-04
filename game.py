@@ -585,10 +585,10 @@ class Game:
                         type = 2
                     else:
                         type = 1
-                    
+
                     self.click_grid_2(type)
                     self.tile_to_action = None
-            
+
             if event.type == pygame.KEYDOWN:
                 if self.box != None:
                     if event.key == pygame.K_ESCAPE:
@@ -851,3 +851,4 @@ class Game:
 if __name__ == "__main__":
     game = Game()
     game.loop()
+

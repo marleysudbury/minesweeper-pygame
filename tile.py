@@ -30,3 +30,4 @@ class Tile:
             sprite = self.parent.images["UNCOVERED"]
 
         self.parent.game_display.blit(sprite, (self.x, self.y))
+
