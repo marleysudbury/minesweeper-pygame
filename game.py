@@ -13,6 +13,7 @@ import sys
 from tile import Tile
 from counter import Counter
 from text_box import TextBox
+from leaderboard import Leaderboard
 from pathlib import Path
 
 
@@ -28,19 +29,23 @@ class Game:
         self.game_display = pygame.display.set_mode(
             (self.W_WIDTH, self.W_HEIGHT))
 
+        # Title of window
         pygame.display.set_caption("Minesweeper by Marley")
 
+        # The size in pixels of each tile in the Minesweeper gird
         self.TILE_SIZE = 21
         self.game_state = "MENU"
         self.game_mode = "EASY"
         self.stop = False
 
+        # Images and sound files are stored in dictionairies
         self.images = {}
         self.image_path = Path("data")
         pygame.mixer.init()
         self.sounds = {}
         self.sound_path = Path("data/tunes")
         self.load_data_initial()
+
         # TODO: Get a propper icon
         # pygame.display.set_icon(self.images["FLAGGED"])
         self.background = self.images["PLAY"]
@@ -74,7 +79,8 @@ class Game:
         self.sounds["music"].play(-1)
         self.sounds["explosion1"].play()
 
-        self.load_leaderboard()
+        self.leaderboard = Leaderboard(self)
+        self.leaderboard.load()
 
         self.box = None
 
@@ -90,10 +96,20 @@ class Game:
 
         # Process paramaters
         arguments = [a.upper() for a in sys.argv]
+        
+        self.touch = False
+        # Variable to store the tile being pressed by user
+        self.tile_to_action = None
+        # Variable to store the time at which they pressed the tile
+        self.touch_time = 0
 
         try:
+            # If the -touch flag was used
             t_index = arguments.index("-TOUCH")
+            # Increase the tile size
             self.TILE_SIZE = 33
+            # TODO: Is this variable used?
+            self.touch = True
         except ValueError:
             pass
             # print("Not touch enabled")
@@ -107,26 +123,6 @@ class Game:
         except ValueError:
             pass
             # print("Not quicklaunch")
-
-        # if sys.argv.contains("-quick"):
-        #     self.game_mode = "EASY"
-        #     if len(sys.argv) > sys.argv.index("-quick"):
-        #         if sys.argv[2].lower() == "medium":
-        #             self.game_mode = "MEDIUM"
-        #         elif sys.argv[2].lower() == "hard":
-        #             self.game_mode = "HARD"
-        #     self.goto_game()
-        # if len(sys.argv) > 1:
-        #     if sys.argv[1].lower() == "-quick":
-        #         self.game_mode = "EASY"
-        #         if len(sys.argv) > 2:
-        #             if sys.argv[2].lower() == "medium":
-        #                 self.game_mode = "MEDIUM"
-        #             elif sys.argv[2].lower() == "hard":
-        #                 self.game_mode = "HARD"
-        #         self.goto_game()
-        #    if sys.argv[1].lower() == "-touch":
-        #       self.TILE_SIZE = 33
 
     def loop(self):
         """The game loop."""
@@ -189,7 +185,8 @@ class Game:
                 elif self.won:
                     self.game_display.blit(self.images["WIN"], (0, 0))
             elif self.game_state == "LEADERBOARD":
-                self.display_leaderboard()
+                #self.display_leaderboard()
+                self.leaderboard.draw()
             if self.game_state == "OPTIONS":
                 if self.mute:
                     self.game_display.blit(self.images["MUTED"], (0, 0))
@@ -236,74 +233,24 @@ class Game:
         self.game_state = "LEADERBOARD"
 
     def update_leaderboard(self):
-        self.return_value = False
-        if self.game_mode == "EASY":
-            if self.time.get_val() < int(self.leaderboard[0][1]):
-                self.leaderboard[0][0] = self.box.get_val()
-                self.leaderboard[0][1] = "{:0>3}".format(self.time.get_val())
-        if self.game_mode == "MEDIUM":
-            if self.time.get_val() < int(self.leaderboard[1][1]):
-                self.get_name()
-                self.leaderboard[1][0] = self.box.get_val()
-                self.leaderboard[1][1] = "{:0>3}".format(self.time.get_val())
-        if self.game_mode == "HARD":
-            if self.time.get_val() < int(self.leaderboard[2][1]):
-                self.get_name()
-                self.leaderboard[2][0] = self.box.get_val()
-                self.leaderboard[2][1] = "{:0>3}".format(self.time.get_val())
+        if self.return_value:
+            self.return_value = False
+            self.leaderboard.update(self.game_mode, self.box.get_val(), "{:0>3}".format(self.time.get_val()))
+            self.box = None
 
-        self.box = None
+            self.sounds["winMusic"].stop()
+            self.sounds["gameOver"].stop()
+            self.sounds["music"].play(-1)
 
-        self.sounds["winMusic"].stop()
-        self.sounds["gameOver"].stop()
-        self.sounds["music"].play(-1)
+            self.timer = False
+            self.lost = False
+            self.won = False
+            self.time.set_val(0)
 
-        self.timer = False
-        self.lost = False
-        self.won = False
-        self.time.set_val(0)
-
-        self.save_leaderboard()
-        self.goto_leaderboard()
-
-    def load_leaderboard(self):
-        self.leaderboard = {}
-        lb_file = open('data/leader.txt')
-        text = lb_file.read().split('\n')
-        for i in range(0, len(text)):
-            self.leaderboard[i] = text[i].split(',')
-
-        lb_file.close()
-
-    def save_leaderboard(self):
-        text = ''
-        for i in range(0, 4):
-            text += '{},{}\n'.format(self.leaderboard[i][0],
-                                     self.leaderboard[i][1])
-        lb_file = open('data/leader.txt', 'w')
-        lb_file.write(text)
-        lb_file.close()
-
-    def reset_leaderboard(self):
-        text = '???,999\n???,999\n???,999\n???,0'
-        lb_file = open('data/leader.txt', 'w')
-        lb_file.write(text)
-        lb_file.close()
-        self.load_leaderboard()
-
-    def display_leaderboard(self):
-        easy = self.font.render('{:<12}{:<10}{}'.format(
-            'Easy', self.leaderboard[0][0], self.leaderboard[0][1]), True, (255, 0, 0))
-        medium = self.font.render(
-            '{:<12}{:<10}{}'.format('Medium', self.leaderboard[1][0], self.leaderboard[1][1]), True, (255, 0, 0))
-        hard = self.font.render('{:<12}{:<10}{}'.format(
-            'Hard', self.leaderboard[2][0], self.leaderboard[2][1]), True, (255, 0, 0))
-        concentric = self.font.render(
-            '{:<12}{}{:>10}'.format('Concentric', self.leaderboard[3][0], ' stage ' + self.leaderboard[3][1]), True, (255, 0, 0))
-        self.game_display.blit(easy, (50, 90))
-        self.game_display.blit(medium, (50, 120))
-        self.game_display.blit(hard, (50, 150))
-        self.game_display.blit(concentric, (50, 180))
+            self.leaderboard.save()
+            self.goto_leaderboard()
+        elif int(self.time.get_val()) < int(self.leaderboard.leaderboard[self.game_mode.lower()][1]):
+            self.get_name()
 
     def get_name(self):
         self.box = TextBox(self.W_WIDTH/2-65/2, self.W_HEIGHT/2-45/2, 65, 45)
@@ -312,18 +259,7 @@ class Game:
         # TODO: refactor the heck out of this plz
         self.won = True
         self.timer = False
-        if self.game_mode == "EASY":
-            if self.time.get_val() < int(self.leaderboard[0][1]):
-                self.get_name()
-        if self.game_mode == "MEDIUM":
-            if self.time.get_val() < int(self.leaderboard[1][1]):
-                self.get_name()
-        if self.game_mode == "HARD":
-            if self.time.get_val() < int(self.leaderboard[2][1]):
-                self.get_name()
-        if self.game_mode == "CONCENTRIC":
-            print("This game mode is not yet implemented.")
-
+        self.update_leaderboard()
         for row in self.tiles:
             for tile in row:
                 if tile.covered and not tile.mine:
@@ -447,10 +383,9 @@ class Game:
                     Tile(self, self.grid_x + (self.TILE_SIZE * j), self.grid_y + (self.TILE_SIZE * i)))
             self.tiles.append(new_row)
 
-    def click_grid(self, type):
+    def get_tile(self):
         pos = pygame.mouse.get_pos()
         if self.tiles[0][0].x <= pos[0] <= self.tiles[0][self.cols-1].x + self.TILE_SIZE and self.tiles[0][0].y <= pos[1] <= self.tiles[self.rows-1][self.cols-1].y + self.TILE_SIZE:
-            # User has clicked inside tile grid
             the_tile = None
             tuple_cov = (0, 0)
             for i, row in enumerate(self.tiles):
@@ -458,47 +393,66 @@ class Game:
                     if tile.x <= pos[0] <= tile.x + self.TILE_SIZE and tile.y <= pos[1] <= tile.y + self.TILE_SIZE:
                         the_tile = tile
                         tuple_cov = (i, j)
+                        
+            return (the_tile, tuple_cov)
+        else:
+            return None
 
-            if self.start:
-                (i, j) = tuple_cov
-                self.place_mines(i, j)
-                self.count_adjacent()
-                self.start = False
-                self.timer = True
-                self.start_time = time.time()
-            if type == 1:
-                # Uncover tile if not flagged
-                if not the_tile.flagged:
-                    the_tile.covered = False
-                    if the_tile.mine:
-                        the_tile.exploded = True
-                        self.lose()
-                    else:
-                        self.tiles_cleared = 0
-                        self.clearing(tuple_cov)
-                        if self.tiles_cleared > 10:
-                            self.sounds["juicy"].play()
-            else:
-                # Toggle flag (unless it is already uncovered)
-                if the_tile.covered:
-                    # the_tile.flagged = not the_tile.flagged
-                    if the_tile.flagged and not the_tile.unsure:
-                        the_tile.unsure = True
-                        self.mine_left.increment()
-                    elif the_tile.flagged:
-                        the_tile.flagged = False
-                        the_tile.unsure = False
-                    else:
-                        the_tile.flagged = True
-                        self.mine_left.decrement()
-                        if self.mine_left.get_val() == 0:
-                            correct = True
-                            for row in self.tiles:
-                                for tile in row:
-                                    if tile.mine and not tile.flagged or not tile.mine and tile.flagged and not tile.unsure:
-                                        correct = False
-                            if correct:
-                                self.win()
+    def click_grid(self, type):
+        if self.get_tile() != None:
+            # User has clicked inside tile grid
+            the_tile, tuple_cov = self.get_tile()
+            
+            # Handle clicks under -touch
+            if self.touch:
+                self.tile_to_action = the_tile
+                self.touch_time = time.time()
+                return
+            
+            self.click_grid_2(type)
+                                
+    def click_grid_2(self, type):
+        the_tile, tuple_cov = self.get_tile()
+        if self.start:
+            (i, j) = tuple_cov
+            self.place_mines(i, j)
+            self.count_adjacent()
+            self.start = False
+            self.timer = True
+            self.start_time = time.time()
+        if type == 1:
+            # Uncover tile if not flagged
+            if not the_tile.flagged:
+                the_tile.covered = False
+                if the_tile.mine:
+                    the_tile.exploded = True
+                    self.lose()
+                else:
+                    self.tiles_cleared = 0
+                    self.clearing(tuple_cov)
+                    if self.tiles_cleared > 10:
+                        self.sounds["juicy"].play()
+        else:
+            # Toggle flag (unless it is already uncovered)
+            if the_tile.covered:
+                # the_tile.flagged = not the_tile.flagged
+                if the_tile.flagged and not the_tile.unsure:
+                    the_tile.unsure = True
+                    self.mine_left.increment()
+                elif the_tile.flagged:
+                    the_tile.flagged = False
+                    the_tile.unsure = False
+                else:
+                    the_tile.flagged = True
+                    self.mine_left.decrement()
+                    if self.mine_left.get_val() == 0:
+                        correct = True
+                        for row in self.tiles:
+                            for tile in row:
+                                if tile.mine and not tile.flagged or not tile.mine and tile.flagged and not tile.unsure:
+                                    correct = False
+                        if correct:
+                            self.win()
 
     def place_mines(self, i, j):
         mine_to_place = self.mines
@@ -605,7 +559,7 @@ class Game:
                     if self.display_done:
                         self.display_done = False
                     elif self.background == self.images["RESET_LEADERBOARD"]:
-                        self.reset_leaderboard()
+                        self.leaderboard.reset()
                         self.display_done = True
                     elif self.background == self.images["MUTE_SOUND"]:
                         # pygame.mixer.stop()
@@ -617,10 +571,20 @@ class Game:
                             self.sounds["music"].play(-1)
                             self.mute = False
 
-                        # print("Shhh")
                         self.display_done = True
                     elif self.background == self.images["RETURN_TO_MENU"]:
                         self.goto_menu()
+            if event.type == pygame.MOUSEBUTTONUP:
+                if self.tile_to_action != None:
+                    current_time = time.time()
+                    if current_time - self.touch_time > 0.5:
+                        type = 2
+                    else:
+                        type = 1
+                    
+                    self.click_grid_2(type)
+                    self.tile_to_action = None
+            
             if event.type == pygame.KEYDOWN:
                 if self.box != None:
                     if event.key == pygame.K_ESCAPE:
@@ -864,12 +828,6 @@ class Game:
             str(self.sound_path / "voice" / "vn.ogg"))
 
         self.loaded["options"] = True
-
-    # def load_data_leaderboard(self):
-    #     # Leaderboard
-    #     self.images["LEADERBOARD_SCREEN"] = pygame.image.load(
-    #         str(self.image_path / "blank.png")).convert_alpha()
-    #     self.loaded["leaderboard"] = True
 
     def load_data_story(self):
         # Story
